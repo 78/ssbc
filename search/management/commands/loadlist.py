@@ -15,7 +15,7 @@ class Command(BaseCommand):
         total = db.filelist.count()
         ii = 0
         ready = []
-        for x in db.filelist.find().skip(ii):
+        for x in db.filelist.find():
             ii += 1
             if ii % 200 == 0:
                 try:
@@ -32,7 +32,8 @@ class Command(BaseCommand):
                 print ii * 100 / total, '%', total - ii
                 ddb.reset_queries()
 
-            h = FileList(info_hash = binascii.hexlify(x['_id']))
+            h = FileList()
+            h.info_hash = binascii.hexlify(x['_id'])
             h.file_list = json.dumps(x['files'])
             ready.append(h)
 

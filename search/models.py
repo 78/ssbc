@@ -20,7 +20,11 @@ class Hash(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class FileList(models.Model):
     info_hash = models.CharField(max_length=40, primary_key=True)
     file_list = models.TextField()
+
+    def __unicode__(self):
+        return self.info_hash
 
