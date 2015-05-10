@@ -28,3 +28,11 @@ class FileList(models.Model):
     def __unicode__(self):
         return self.info_hash
 
+class StatusReport(models.Model):
+    date = models.DateField()
+    new_hashes = models.IntegerField()
+    total_requests = models.IntegerField()
+    valid_requests = models.IntegerField()
+    def __unicode__(self):
+        return self.date
+

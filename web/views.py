@@ -11,6 +11,7 @@ API_URL = 'http://127.0.0.1:8001/api/'
 API_HOST = 'www.shousibaocai.com'
 re_punctuations = re.compile(
     u"。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]")
+req_session = requests.Session()
 
 # Create your views here.
 def index(request):
@@ -23,7 +24,7 @@ def hash(request, h):
         'hashes': h,
     }
     url = API_URL + 'json_info?' + urllib.urlencode(qs)
-    r = requests.get(url, headers={'Host':API_HOST})
+    r = req_session.get(url, headers={'Host':API_HOST})
     try:
         j = r.json()
     except:
@@ -54,7 +55,7 @@ def search(request, keyword, p):
         'start': d['offset'],
     }
     url = API_URL + 'json_search?' + urllib.urlencode(qs)
-    r = requests.get(url, headers={'Host':API_HOST})
+    r = req_session.get(url, headers={'Host':API_HOST})
     d.update(r.json())
     # Fill info
     ids = '-'.join([str(x['id']) for x in d['result']['items']])
@@ -63,7 +64,7 @@ def search(request, keyword, p):
             'hashes': ids,
         }
         url = API_URL + 'json_info?' + urllib.urlencode(qs)
-        r = requests.get(url, headers={'Host':API_HOST})
+        r = req_session.get(url, headers={'Host':API_HOST})
         j = r.json()
 
         for x in d['result']['items']:

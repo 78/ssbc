@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from ssbc import settings
 from django.http import JsonResponse, HttpResponse
-from search.models import Hash, FileList
+from search.models import Hash, FileList, StatusReport
 from sphinxit.core.helpers import BaseSearchConfig
 from sphinxit.core.processor import Search
 import binascii
@@ -10,11 +10,11 @@ import memcache
 
 class SphinxitConfig(BaseSearchConfig):
     WITH_STATUS = False
-search_query = Search(indexes=['rt_main'], config=SphinxitConfig)
 mc = memcache.Client(['127.0.0.1:11211'],debug=0)
 
 # Create your views here.
 def json_search(request):
+    search_query = Search(indexes=['rt_main'], config=SphinxitConfig)
     keyword = request.GET['keyword']
     start = request.GET.get('start', 0)
     count = request.GET.get('count', 10)
@@ -57,4 +57,10 @@ def json_info(request):
     mc.set(mckey, jsp.content)
     return jsp
 
+def json_status(request):
+    d = {}
+    d['hash_total'] = Hash.objects.count()
+    reports = StatusReport.objects.order_by('-date')[:30]
+    d['reports'] = list(reports.values())
+    return JsonResponse(d)
 
