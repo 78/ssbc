@@ -43,7 +43,10 @@ def json_info(request):
 
     res = {}
     for h in hashes.split('-'):
-        item = Hash.objects.filter(id=h).values()
+        if len(h) == 40:
+            item = Hash.objects.filter(info_hash=h).values()
+        else:
+            item = Hash.objects.filter(id=h).values()
         res[h] = item[0]
         try:
             filelist = FileList.objects.get(info_hash=res[h]['info_hash'])

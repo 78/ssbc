@@ -5,7 +5,7 @@ import sys
 import urllib
 import requests
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 API_URL = 'http://127.0.0.1:8000/api/'
 re_punctuations = re.compile(
@@ -81,4 +81,9 @@ def search(request, keyword, p):
     d['next_pages'] = range( d['p']+1, int(min(d['page_max']+1, max(d['p']-w/2,1) + w )) )
     return render(request, 'list.html', d)
 
+def hash_old(request, h):
+    return redirect('/hash/' + h, permanent=True)
+
+def search_old(request, kw, p):
+    return redirect('list', kw, p)
 
