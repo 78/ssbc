@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}磁力搜索{% endblock %}
+
+{% block metas %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+{% endblock %}
+
+{% block styles %}
+{{block.super}}
+<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="/static/css/ssbc.css?v=0716" />
+{% endblock %}
+
+{% block navbar %}
+<form class="x-sform" method="get" action="/">
+<nav class="navbar navbar-default " role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a title="手撕包菜 收录最快的DHT搜索引擎" alt="shousibaocai" class="navbar-brand" href="{% url 'index' %}">手撕包菜</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+            <li class="active"><a href="{% url 'index' %}">磁力搜索</a></li>
+            </ul>
+
+            {% if request.path != '/' %}
+            <div class="navbar-form x-searchbar navbar-left">
+                <div class="input-group">
+                    <input type="text" autocomplete="off" class="form-control x-kw" name="s" value="{{keyword}}">
+                    <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                    </span>
+                </div><!-- /input-group -->
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+</form>
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <p>No content</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.0.min.js"></script>
+<script src="//ajax.aspnetcdn.com/ajax/bootstrap/3.1.1/bootstrap.min.js"></script>
+<script src="/static/js/bootstrap-typeahead.min.js"></script>
+<script src="/static/js/ssbc.js?v=12"></script>
+{% include 'analytics.html' %}
+{% endblock %}
+

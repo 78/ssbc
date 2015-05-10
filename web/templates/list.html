@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{keyword}} 下载 - 磁力搜索{% endblock %}
+{% block metas %}
+{{block.super}}
+<meta name="keywords" content="{{keyword}},磁力链接,BT下载,迅雷下载,在线播放,磁力搜索" />
+<meta name="description" content="查看关于{{keyword}}的热门资源" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="div-ads" style="margin-top: -10px; ">
+    </div>
+
+{% load filters %}
+<h4>共找到 {{result.meta.total}} 条关于 {{keyword}} 的结果，耗时 {{result.meta.time}} 秒.</h4>
+<table class="table">
+    {% for x in result.items %}
+    <tr><td class="x-item">
+        <div>
+            <a title="{{x.name}}" class="title" href="{% url 'hash' x.id%}">{{x.name|highlight:words}}</a>
+            <span class="ctime">{{x.create_time|format_time}}</span>
+        </div>
+        <div class="files">
+            <ul>
+                {% if 'files' in x %}
+                    {% for y in x.files %}
+                        <li>{{y.path}}  {{y.length|filesizeformat}}</li>
+                    {% endfor %}
+                        <li>....</li>
+                {% else %}
+                    <li>{{x.name}}  {{x.length|filesizeformat}}</li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="tail">
+            文件数: {{x.files|length}} 大小: {{x.length|filesizeformat}}  请求数: {{x.requests}} 更新时间: {{x.last_seen|format_time}}
+            {% if x.category == 'video' %}
+            {% endif %}
+            &nbsp; &nbsp;
+            <a class="title" href="{{x.magnet_url}}"><span class="glyphicon glyphicon-magnet"></span> 磁力链接</a>
+            &nbsp; &nbsp;
+        </div>
+    </td></tr>
+    {% endfor %}
+</table>
+{% include 'pagination.html' %}
+
+</div>
+{% include 'foot.html' %}
+{% endblock %}
+
+{% block scripts %}
+{{block.super}}
+<script>
+</script>
+{% endblock %}
+
