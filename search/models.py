@@ -9,7 +9,7 @@ class Hash(models.Model):
     extension = models.CharField(max_length=20)
     classified = models.BooleanField(default=False)
     source_ip = models.CharField(max_length=20, null=True)
-    tagged = models.BooleanField(default=False)
+    tagged = models.BooleanField(default=False, db_index=True)
     length = models.BigIntegerField()
     create_time = models.DateTimeField()
     last_seen = models.DateTimeField()
@@ -29,7 +29,7 @@ class FileList(models.Model):
         return self.info_hash
 
 class StatusReport(models.Model):
-    date = models.DateField()
+    date = models.DateField(unique=True)
     new_hashes = models.IntegerField()
     total_requests = models.IntegerField()
     valid_requests = models.IntegerField()
