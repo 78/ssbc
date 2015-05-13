@@ -34,7 +34,7 @@ def hash(request, h):
     if 'files' in d['info']:
         d['info']['files'] = [y for y in d['info']['files'] if not y['path'].startswith(u'_')]
         d['info']['files'].sort(key=lambda x:x['length'], reverse=True)
-    d['magnet_url'] = 'magnet:?' + urllib.urlencode({'xt':'urn:btih:%s'% (d['info']['info_hash']), 'dn':d['info']['name'].encode('utf8')})
+    d['magnet_url'] = 'magnet:?xt=urn:btih:' + d['info']['info_hash'] + '&' + urllib.urlencode({'dn':d['info']['name'].encode('utf8')})
     d['download_url'] = 'http://www.so.com/s?' + urllib.urlencode({'ie':'utf-8', 'src': 'ssbc', 'q': d['info']['name'].encode('utf8')})
     return render(request, 'info.html', d)
 
@@ -69,7 +69,7 @@ def search(request, keyword, p):
 
         for x in d['result']['items']:
             x.update(j[str(x['id'])])
-            x['magnet_url'] = 'magnet:?' + urllib.urlencode({'xt':'urn:btih:%s'% (x['info_hash']), 'dn':x['name'].encode('utf8')})
+            x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
             if 'files' in x:
                 x['files'] = [y for y in x['files'] if not y['path'].startswith(u'_')][:5]
                 x['files'].sort(key=lambda x:x['length'], reverse=True)
