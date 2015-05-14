@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 #coding: utf8
+"""
+从MySQL数据库中读取未索引的资源，更新到Sphinx的实时索引中。
+xiaoxia@xiaoxia.org
+2015.5 created
+"""
 
 import time
 import MySQLdb as mdb

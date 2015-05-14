@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 #coding: utf8
+"""
+磁力搜索爬虫代码
+爬虫获取的hash地址会放进队列，由负责下载资源信息的meta_worker处理和入库。
+xiaoxia@xiaoxia.org
+2013.5 created
+2015.5 updated
+"""
 
 import bencode
 import sys
@@ -19,7 +26,7 @@ import Queue
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 DHT_PORT = 6881
-DHT_IP = '98.126.37.226'
+DHT_IP = socket.gethostbyname(socket.gethostname())
 
 req_queue = Queue.Queue(1000)
 
@@ -38,7 +45,7 @@ class DHT(threading.Thread):
                 break
             except:
                 DHT_PORT += 1
-        print 'Bind socket at port', DHT_PORT
+        print 'Bind socket at %s:%s' % (DHT_IP, DHT_PORT)
         self.node_id = self.get_random_id()
         self.version = 'XTxx'
         self.new_nodes = Queue.Queue()

@@ -1,5 +1,13 @@
 #!/usr/bin/env python2.6
 #coding: utf8
+"""
+磁力搜索meta信息入库程序
+从队列里读取hash，如果数据库里不存在，就使用libtorrent获取meta信息，保存到数据库中。
+xiaoxia@xiaoxia.org
+2013.5 created
+2015.5 updated
+"""
+
 
 import cPickle
 import hashlib
