@@ -9,5 +9,4 @@
 与爬虫相关的代码都在目录workers下。
 
 相关文章请查看作者博客：
-http://xiaoxia.org/2015/05/14/shousibaocai-opensource/
-
+http://xiaoxia.org/2015/05/15/shousibaocai-opensource/
