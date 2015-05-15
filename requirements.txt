@@ -9,7 +9,6 @@ meld3==1.0.2
 MySQL-python==1.2.5
 ordereddict==1.1
 oursql==0.9.3.1
-PIL==1.1.7
 pymongo==3.0.1
 python-memcached==1.54
 requests==2.7.0

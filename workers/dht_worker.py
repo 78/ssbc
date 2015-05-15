@@ -295,7 +295,6 @@ if __name__ == '__main__':
     dht.find_node(('router.bittorrent.com',6881), dht.get_random_id())
     dht.find_node(('router.utorrent.com',6881), dht.get_random_id())
     dht.find_node(('dht.transmission.com',6881), dht.get_random_id())
-    dht.get_peers(('70.39.87.34',6881), dht.get_random_id())
     while True:
         dht.auto_find()
         time.sleep(.1)
