@@ -24,7 +24,7 @@ def json_search(request):
     if request.GET.get('base64') == '1':
         keyword = keyword.decode('base64').decode('utf8')
 
-    mckey = str(binascii.crc32((u'%s%s%s' % (keyword,start,count)).encode('utf8')) & 0xFFFFFFFFL)
+    mckey = str(binascii.crc32((u'%s%s%s%s%s' % (keyword,start,count,sort,category)).encode('utf8')) & 0xFFFFFFFFL)
     cache = mc.get(mckey)
     if cache:
         print 'bingo', keyword.encode('utf8'), mckey
@@ -34,7 +34,7 @@ def json_search(request):
     if category: q = q.filter(category__eq=binascii.crc32(category)&0xFFFFFFFFL)
     if sort == 'create_time': q = q.order_by('create_time', 'desc')
     if sort == 'length': q = q.order_by('length', 'desc')
-    q = q.options(ranker='sph04').limit(start, count)
+    q = q.limit(start, count)
     q2 = search_query.match(keyword).select('category', Count()).group_by('category').named('cats')
     res = q.ask(subqueries=[q2])
 
