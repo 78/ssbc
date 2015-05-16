@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^hash/(.{40})$', web.views.hash),
     url(r'^info/(.{40})$', web.views.hash_old),
     url(r'^search/(.+?)/(\d*)$', web.views.search_old),
-    url(r'^list/(.+?)/(\d*)$', web.views.search, name='list'),
+    url(r'^search/(.+?)$', web.views.search),
+    url(r'^list/(.+?)/(\d*)$', web.views.search_list, name='list'),
 ]

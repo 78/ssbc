@@ -1,18 +1,26 @@
 #coding: utf8
 import os
+import binascii
+
+cats = {
+    u'video': u'视频',
+    u'image': u'图片',
+    u'document': u'书籍',
+    u'music': u'音乐',
+    u'package': u'压缩',
+    u'software': u'软件',
+}
 
 def get_label(name):
-    cats = {
-        u'video': u'视频',
-        u'image': u'图片',
-        u'document': u'书籍',
-        u'music': u'音乐',
-        u'package': u'压缩',
-        u'software': u'软件',
-    }
     if name in cats:
         return cats[name]
     return u'其它'
+
+def get_label_by_crc32(n):
+    for k in cats:
+        if binascii.crc32(k)&0xFFFFFFFFL == n:
+            return k
+    return u'other'
 
 def get_extension(name):
     return os.path.splitext(name)[1]

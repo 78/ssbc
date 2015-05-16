@@ -14,7 +14,19 @@
     </div>
 
 {% load filters %}
-<h4>共找到 {{result.meta.total}} 条关于 {{keyword}} 的结果，耗时 {{result.meta.time}} 秒.</h4>
+<h4>共找到 {{result.meta.total_found}} 条关于 {{keyword}} 的结果，耗时 {{result.meta.time}} 秒.</h4>
+<p>
+    <div class="btn-group" role="group">
+    {% for x in cats_navs %}
+        <a class="btn btn-default {% ifequal x.value category%}active{%endifequal%}" href="./?c={{x.value}}&s={{sort}}">{{x.name}} ({{x.num}})</a>
+    {% endfor %}
+    </div>
+    <div class="pull-right btn-group" role="group">
+    {% for x in sort_navs %}
+        <a class="btn btn-default {% ifequal x.value sort %}active{%endifequal%}" href="./?c={{category}}&s={{x.value}}">{{x.name}}</a>
+    {% endfor %}
+    </div>
+</p>
 <table class="table">
     {% for x in result.items %}
     <tr><td class="x-item">
