@@ -31,7 +31,7 @@ $('.x-sform').submit(function(e){
         $('.x-kw').focus();
         return false;
     }
-    var url = '/list/' + encodeURIComponent(kw) + '/1';
+    var url = '/list/' + encodeURIComponent(kw) + '/';
     window.location = url;
     return false;
 });

@@ -4,10 +4,11 @@ import datetime
 import sys
 import urllib
 import requests
+import workers.metautils
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-API_URL = 'http://127.0.0.1:8001/api/'
+API_URL = 'http://70.39.87.34:8001/api/'
 API_HOST = 'www.shousibaocai.com'
 re_punctuations = re.compile(
     u"。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]")
@@ -39,13 +40,15 @@ def hash(request, h):
     return render(request, 'info.html', d)
 
 
-def search(request, keyword, p):
+def search(request, keyword=None, p=None):
     d = {'keyword': keyword}
     d['words'] = list(set(re_punctuations.sub(u' ', d['keyword']).split()))
     try:
-        d['p'] = int(p)
+        d['p'] = int(p or request.GET.get('p'))
     except:
         d['p'] = 1
+    d['category'] = request.GET.get('c', '')
+    d['sort'] = request.GET.get('s', 'create_time')
     d['ps'] = 10
     d['offset'] = d['ps']*(d['p']-1)
     # Fetch list
@@ -53,6 +56,8 @@ def search(request, keyword, p):
         'keyword': keyword.encode('utf8'),
         'count': d['ps'],
         'start': d['offset'],
+        'category': d['category'],
+        'sort': d['sort'],
     }
     url = API_URL + 'json_search?' + urllib.urlencode(qs)
     r = req_session.get(url, headers={'Host':API_HOST})
@@ -77,10 +82,20 @@ def search(request, keyword, p):
                 x['files'] = [{'path': x['name'], 'length': x['length']}]
     # pagination
     w = 10
-    total = int(d['result']['meta']['total'])
+    total = int(d['result']['meta']['total_found'])
     d['page_max'] = total / d['ps'] if total % d['ps'] == 0 else total/d['ps'] + 1
     d['prev_pages'] = range( max(d['p']-w+min(int(w/2), d['page_max']-d['p']),1), d['p'])
     d['next_pages'] = range( d['p']+1, int(min(d['page_max']+1, max(d['p']-w/2,1) + w )) )
+    d['sort_navs'] = [
+        {'name': '按收录时间', 'value': 'create_time'},
+        {'name': '按文件大小', 'value': 'length'},
+        {'name': '按相关性', 'value': 'relavance'},
+    ]
+    d['cats_navs'] = [{'name': '全部', 'num': total, 'value': ''}]
+    for x in d['cats']['items']:
+        v = workers.metautils.get_label_by_crc32(x['category'])
+        d['cats_navs'].append({'value': v, 'name': workers.metautils.get_label(v), 'num': x['num']})
+        
     return render(request, 'list.html', d)
 
 def hash_old(request, h):
@@ -88,4 +103,7 @@ def hash_old(request, h):
 
 def search_old(request, kw, p):
     return redirect('list', kw, p)
+
+def search_list(request, kw, p):
+    return search(request, kw, p)
 
