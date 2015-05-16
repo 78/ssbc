@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from search.models import Hash, FileList, StatusReport
 from sphinxit.core.helpers import BaseSearchConfig
 from sphinxit.core.processor import Search
+from sphinxit.core.nodes import Count
 import binascii
 import json
 import memcache
@@ -18,6 +19,8 @@ def json_search(request):
     keyword = request.GET['keyword']
     start = request.GET.get('start', 0)
     count = request.GET.get('count', 10)
+    sort = request.GET.get('sort', '')
+    category = request.GET.get('category', '')
     if request.GET.get('base64') == '1':
         keyword = keyword.decode('base64').decode('utf8')
 
@@ -27,8 +30,13 @@ def json_search(request):
         print 'bingo', keyword.encode('utf8'), mckey
         return HttpResponse(cache)
 
-    q = search_query.match(keyword).limit(start, count).order_by('create_time', 'desc')
-    res = q.ask()
+    q = search_query.match(keyword)
+    if category: q = q.filter(category__eq=binascii.crc32(category)&0xFFFFFFFFL)
+    if sort == 'create_time': q = q.order_by('create_time', 'desc')
+    if sort == 'length': q = q.order_by('length', 'desc')
+    q = q.options(ranker='sph04').limit(start, count)
+    q2 = search_query.match(keyword).select('category', Count()).group_by('category').named('cats')
+    res = q.ask(subqueries=[q2])
 
     jsp = JsonResponse(res)
     mc.set(mckey, jsp.content)
