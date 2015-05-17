@@ -8,7 +8,7 @@ import workers.metautils
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-API_URL = 'http://70.39.87.34:8001/api/'
+API_URL = 'http://127.0.0.1:8001/api/'
 API_HOST = 'www.shousibaocai.com'
 re_punctuations = re.compile(
     u"。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]")

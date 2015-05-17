@@ -33,7 +33,7 @@ import MySQLdb as mdb
 
 threading.stack_size(128000)
 socket.setdefaulttimeout(60)
-MAX_READ = 30
+MAX_READ = 20
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
 DB_PASS = ''
