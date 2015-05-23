@@ -196,7 +196,6 @@ class DHT(threading.Thread):
                 }
                 self.send_message(addr, m)
             elif msg['q'] == 'announce_peer':
-                a = '%s:%s' % (addr[0], a['port'])
                 self.log_info_hash(addr, a['info_hash'], msg.get('v',''))
             else:
                 print '[R]', msg, 'from', addr
