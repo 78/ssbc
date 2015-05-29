@@ -33,7 +33,7 @@ import MySQLdb as mdb
 
 threading.stack_size(128000)
 socket.setdefaulttimeout(60)
-MAX_READ = 20
+MAX_READ = 50
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
 DB_PASS = ''
@@ -140,7 +140,7 @@ class DHTReporter(threading.Thread):
         if torrent.get('comment'):
             info['comment'] = self.decode_utf8(torrent, 'comment')
         if torrent.get('publisher-url'):
-            self.encoding = self.decode_utf8(torrent, 'publisher-url')
+            info['publisher-url'] = self.decode_utf8(torrent, 'publisher-url')
         if torrent.get('publisher'):
             info['publisher'] = self.decode_utf8(torrent, 'publisher')
         if torrent.get('created by'):
