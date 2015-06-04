@@ -8,7 +8,9 @@ import workers.metautils
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-API_URL = 'http://70.39.87.34:8001/api/'
+from lib import politics
+
+API_URL = 'http://127.0.0.1:8001/api/'
 API_HOST = 'www.shousibaocai.com'
 re_punctuations = re.compile(
     u"。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]")
@@ -42,6 +44,8 @@ def hash(request, h):
 
 
 def search(request, keyword=None, p=None):
+    if politics.is_sensitive(keyword):
+        return redirect('/?' + urllib.urlencode({'notallow': keyword.encode('utf8')}))
     d = {'keyword': keyword}
     d['words'] = list(set(re_punctuations.sub(u' ', d['keyword']).split()))
     try:
