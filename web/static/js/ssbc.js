@@ -41,11 +41,11 @@ function showAds(){
     if(ua.indexOf('iP') > -1 || ua.indexOf('Android') > -1){ //移动端排版
     }else if(ua.indexOf('Apple1') > -1 && window.location.pathname=='/'){ //苹果
     }else{
-        //$('.div-ads-front').html('<a href="http://love.gemblepan.com/?from=frontads" target="_blank"><img src="/static/ss_ad.png"></a>');
-        //$('.div-ads').html('<a href="http://love.gemblepan.com/?from=ads" target="_blank"><img src="/static/ss_banner.gif"></a>');
+        /*
         if(window.location.href.indexOf('/info/') > -1 || window.location.href.indexOf('/list/') > -1){
             document.write('<script type="text/javascript" src="http://cip2.czpush.com/promote.php?id=100072"><\/script>');
         }
+        */
     }
 
 }
