@@ -18,7 +18,7 @@ req_session = requests.Session()
 
 # Create your views here.
 def index(request):
-    reclist = ['哆啦A梦伴我同行', '复仇者联盟2', '速度与激情7','王牌特工']
+    reclist = ['侏罗纪','末日崩塌','哆啦A梦伴我同行', '复仇者联盟2', '速度与激情7','王牌特工']
     d = {'reclist': reclist}
     #return render(request, 'test.html', d)
     return render(request, 'index.html', d)
@@ -113,4 +113,7 @@ def search_old(request, kw, p):
 
 def search_list(request, kw, p):
     return search(request, kw, p)
+
+def howto(request):
+    return render(request, 'howto.html', {})
 
