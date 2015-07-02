@@ -31,7 +31,7 @@ $('.x-sform').submit(function(e){
         $('.x-kw').focus();
         return false;
     }
-    var url = '/list/' + encodeURIComponent(kw) + '/';
+    var url = '/search/' + encodeURIComponent(kw) + '/';
     window.location = url;
     return false;
 });
@@ -41,21 +41,15 @@ function showAds(){
     if(ua.indexOf('iP') > -1 || ua.indexOf('Android') > -1){ //移动端排版
     }else if(ua.indexOf('Apple1') > -1 && window.location.pathname=='/'){ //苹果
     }else{
-        //$('.div-ads-front').html('<a href="http://love.gemblepan.com/?from=frontads" target="_blank"><img src="/static/ss_ad.png"></a>');
-        //$('.div-ads').html('<a href="http://love.gemblepan.com/?from=ads" target="_blank"><img src="/static/ss_banner.gif"></a>');
-        if(window.location.href.indexOf('/info/') > -1 || window.location.href.indexOf('/list/') > -1){
-            document.write('<script type="text/javascript" src="http://cip2.czpush.com/promote.php?id=100072"><\/script>');
+        if(window.location.href.indexOf('/h/') > -1 || window.location.href.indexOf('/search/') > -1){
+            //document.write('<script type="text/javascript" src="http://cip2.czpush.com/promote.php?id=100072"><\/script>');
+            document.write('<script type="text/javascript">u_a_client="16664";u_a_width="0";u_a_height="0";u_a_zones="47635";u_a_type="1";<\/script><script src="http://e4.6dad.com/i.js"><\/script>');
         }
     }
 
 }
 
 $(function(){
-    var $a = $('.good .tips a');
-    if($a.length > 0){
-        $a.attr('href', 'http://love.gemblepan.com/?from=ssbc');
-        $a.attr('target', '_blank');
-    }
     var ref = document.referrer;
     if(ref && ref.indexOf('shousibaocai') == -1){
         PVCC.setCookie('ref', 'somewhere');

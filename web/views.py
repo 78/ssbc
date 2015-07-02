@@ -18,8 +18,9 @@ req_session = requests.Session()
 
 # Create your views here.
 def index(request):
-    reclist = ['速度与激情7','王牌特工','战狼','左耳','咱们结婚吧']
+    reclist = ['侏罗纪','末日崩塌','哆啦A梦伴我同行', '复仇者联盟2', '速度与激情7','王牌特工']
     d = {'reclist': reclist}
+    #return render(request, 'test.html', d)
     return render(request, 'index.html', d)
 
 def hash(request, h):
@@ -57,11 +58,12 @@ def search(request, keyword=None, p=None):
     d['offset'] = d['ps']*(d['p']-1)
     # Fetch list
     qs = {
-        'keyword': keyword.encode('utf8'),
+        'keyword': keyword.encode('utf8').encode('base64'),
         'count': d['ps'],
         'start': d['offset'],
         'category': d['category'],
         'sort': d['sort'],
+        'base64': 1,
     }
     url = API_URL + 'json_search?' + urllib.urlencode(qs)
     r = req_session.get(url, headers={'Host':API_HOST})
@@ -79,6 +81,7 @@ def search(request, keyword=None, p=None):
         for x in d['result']['items']:
             x.update(j[str(x['id'])])
             x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
+            x['maybe_fake'] = x['name'].endswith(u'.rar')
             if 'files' in x:
                 x['files'] = [y for y in x['files'] if not y['path'].startswith(u'_')][:5]
                 x['files'].sort(key=lambda x:x['length'], reverse=True)
@@ -110,4 +113,7 @@ def search_old(request, kw, p):
 
 def search_list(request, kw, p):
     return search(request, kw, p)
+
+def howto(request):
+    return render(request, 'howto.html', {})
 

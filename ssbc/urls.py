@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'^h/(\d{1,10})$', web.views.hash, name='hash'),
     url(r'^hash/(.{40})$', web.views.hash),
     url(r'^info/(.{40})$', web.views.hash_old),
-    url(r'^search/(.+?)/(\d*)$', web.views.search_old),
+    url(r'^search/(.+?)/(\d*)$', web.views.search_list, name='list'),
     url(r'^search/(.+?)$', web.views.search),
-    url(r'^list/(.+?)/(\d*)$', web.views.search_list, name='list'),
+    url(r'^list/(.+?)/(\d*)$', web.views.search_old),
+    url(r'^howto/$', web.views.howto, name='howto'),
 ]

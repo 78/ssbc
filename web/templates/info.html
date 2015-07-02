@@ -32,7 +32,7 @@
             <th class="col-lg-2">关键词</th>
             <td>
             {% for kw in keywords %}
-                <a alt="{{kw}} 磁力搜索" href="/list/{{kw|urlencode}}/">{{kw}}</a>
+                <a alt="{{kw}} 磁力搜索" href="/search/{{kw|urlencode}}/">{{kw}}</a>
             {% endfor %}
             </td>
         </tr>
@@ -49,7 +49,7 @@
             <td>
                 <a target="_blank" href="{{magnet_url}}">{{info.info_hash}}</a>
                 &nbsp; &nbsp;
-                <a href="{{magnet_url}}"><span class="glyphicon glyphicon-download-alt"></span> Download</a>
+                <a href="{{magnet_url}}"><span class="glyphicon glyphicon-download-alt"></span> 磁力链接</a>
             </td>
         </tr>
     </table>
