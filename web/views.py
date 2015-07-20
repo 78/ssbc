@@ -16,12 +16,14 @@ re_punctuations = re.compile(
     u"。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]")
 req_session = requests.Session()
 
+
 # Create your views here.
 def index(request):
     reclist = ['侏罗纪','末日崩塌','哆啦A梦伴我同行', '复仇者联盟2', '速度与激情7','王牌特工']
     d = {'reclist': reclist}
     #return render(request, 'test.html', d)
     return render(request, 'index.html', d)
+
 
 def hash(request, h):
     qs = {
@@ -105,14 +107,18 @@ def search(request, keyword=None, p=None):
         
     return render(request, 'list.html', d)
 
+
 def hash_old(request, h):
     return redirect('/hash/' + h, permanent=True)
+
 
 def search_old(request, kw, p):
     return redirect('list', kw, p)
 
+
 def search_list(request, kw, p):
     return search(request, kw, p)
+
 
 def howto(request):
     return render(request, 'howto.html', {})
