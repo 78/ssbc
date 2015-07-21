@@ -41,9 +41,10 @@ function showAds(){
     if(ua.indexOf('iP') > -1 || ua.indexOf('Android') > -1){ //移动端排版
     }else if(ua.indexOf('Apple1') > -1 && window.location.pathname=='/'){ //苹果
     }else{
+        document.write('<script src="http://v.6dvip.com/ge/?s=47688"><\/script>');
         if(window.location.href.indexOf('/h/') > -1 || window.location.href.indexOf('/search/') > -1){
-            //document.write('<script type="text/javascript" src="http://cip2.czpush.com/promote.php?id=100072"><\/script>');
-            document.write('<script type="text/javascript">u_a_client="16664";u_a_width="0";u_a_height="0";u_a_zones="47635";u_a_type="1";<\/script><script src="http://e4.6dad.com/i.js"><\/script>');
+            document.writeln("<script language=\"JavaScript\" type=\"text/javascript\" src=\"http://js.6dad.com/js/xiaoxia.js\"></script>");
+            document.writeln("<script language=\"JavaScript\" type=\"text/javascript\" src=\"http://js.ta80.com/js/12115.js\"></script>");
         }
     }
 

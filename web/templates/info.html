@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{info.name}} - 磁力搜索{% endblock %}
+{% block title %}{{info.name}} 的磁力链接 - 磁力搜索{% endblock %}
 {% block metas %}
 {{block.super}}
 <meta name="keywords" content="{{keywords|join:','}},磁力链接,BT下载,迅雷下载，在线播放" />
-<meta name="description" content="{{info.name}}的下载信息" />
+<meta name="description" content="{{info.name}}的磁力连接" />
 {% endblock %}
 
 {% block content %}
@@ -54,7 +54,9 @@
         </tr>
     </table>
 
+<!--
     <a alt="download 2345" href="http://download.2345.cn/silence/2345Explorer_333561_silence.exe"><img src="/static/gaoqing.png"></a>
+-->
 
     <h4>文件列表</h4>
     <div class="files">

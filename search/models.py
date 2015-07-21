@@ -33,6 +33,7 @@ class StatusReport(models.Model):
     new_hashes = models.IntegerField()
     total_requests = models.IntegerField()
     valid_requests = models.IntegerField()
+
     def __unicode__(self):
-        return self.date
+        return u'%s - %s' % (self.date, self.new_hashes)
 

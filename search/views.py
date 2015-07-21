@@ -55,9 +55,10 @@ def json_info(request):
             item = Hash.objects.filter(info_hash=h).values()
         else:
             item = Hash.objects.filter(id=h).values()
-        if item.count() == 0:
-            continue
-        res[h] = item[0]
+        try:
+            res[h] = item[0]
+        except:
+            return HttpResponse('{}')
         try:
             filelist = FileList.objects.get(info_hash=res[h]['info_hash'])
             res[h]['files'] = json.loads(filelist.file_list)

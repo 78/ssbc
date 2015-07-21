@@ -26,7 +26,7 @@ import Queue
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 DHT_PORT = 6881
-DHT_IP = socket.gethostbyname(socket.gethostname())
+DHT_IP = IP
 
 req_queue = Queue.Queue(1000)
 

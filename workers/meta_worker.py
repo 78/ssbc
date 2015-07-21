@@ -32,8 +32,8 @@ import threading
 import MySQLdb as mdb
 
 threading.stack_size(128000)
-socket.setdefaulttimeout(60)
-MAX_READ = 50
+socket.setdefaulttimeout(50)
+MAX_READ = 10
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
 DB_PASS = ''
@@ -285,5 +285,6 @@ if __name__ == '__main__':
     for x in xrange(MAX_READ):
         reporter = DHTReporter()
         reporter.start()
+    q.put({'info_hash': '73DA54AA9A0A8EB36A88112C9258AD1821D9DDB3'.lower(), 'ip':'127.0.0.1',})
     load_queue_from_rpc()
 

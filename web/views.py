@@ -18,9 +18,8 @@ req_session = requests.Session()
 
 # Create your views here.
 def index(request):
-    reclist = ['侏罗纪','末日崩塌','哆啦A梦伴我同行', '复仇者联盟2', '速度与激情7','王牌特工']
+    reclist = ['泰迪熊2', '杀破狼2', '侏罗纪','末日崩塌','哆啦A梦伴我同行', '复仇者联盟2']
     d = {'reclist': reclist}
-    #return render(request, 'test.html', d)
     return render(request, 'index.html', d)
 
 def hash(request, h):
@@ -39,7 +38,7 @@ def hash(request, h):
         d['info']['files'] = [y for y in d['info']['files'] if not y['path'].startswith(u'_')]
         d['info']['files'].sort(key=lambda x:x['length'], reverse=True)
     d['magnet_url'] = 'magnet:?xt=urn:btih:' + d['info']['info_hash'] + '&' + urllib.urlencode({'dn':d['info']['name'].encode('utf8')})
-    d['download_url'] = 'http://www.so.com/s?' + urllib.urlencode({'ie':'utf-8', 'src': 'ssbc', 'q': d['info']['name'].encode('utf8')})
+    d['download_url'] = 'http://www.haosou.com/s?' + urllib.urlencode({'ie':'utf-8', 'src': 'ssbc', 'q': d['info']['name'].encode('utf8')})
     return render(request, 'info.html', d)
 
 
