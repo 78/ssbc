@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Hash(models.Model):
     info_hash = models.CharField(max_length=40, unique=True)
@@ -27,6 +28,7 @@ class FileList(models.Model):
 
     def __unicode__(self):
         return self.info_hash
+
 
 class StatusReport(models.Model):
     date = models.DateField(unique=True)

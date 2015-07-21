@@ -1,3 +1,4 @@
+#coding: utf8
 from django.shortcuts import render
 from ssbc import settings
 from django.http import JsonResponse, HttpResponse
@@ -9,11 +10,12 @@ import binascii
 import json
 import memcache
 
+
 class SphinxitConfig(BaseSearchConfig):
     WITH_STATUS = False
 mc = memcache.Client(['127.0.0.1:11211'],debug=0)
 
-# Create your views here.
+
 def json_search(request):
     search_query = Search(indexes=['rt_main'], config=SphinxitConfig)
     keyword = request.GET['keyword']
@@ -42,6 +44,7 @@ def json_search(request):
     mc.set(mckey, jsp.content)
     return jsp
 
+
 def json_info(request):
     hashes = request.GET['hashes']
     mckey = str(binascii.crc32(str(hashes)) & 0xFFFFFFFFL)
@@ -67,6 +70,7 @@ def json_info(request):
     jsp = JsonResponse(res)
     mc.set(mckey, jsp.content)
     return jsp
+
 
 def json_status(request):
     d = {}
