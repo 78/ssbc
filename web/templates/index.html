@@ -23,8 +23,8 @@
         </div>
         <div class="good">
             <p>
-            {% for kw in reclist%}
-                <a href="/search/{{kw|urlencode}}/">{{kw}}</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            {% for r in reclist%}
+                <a href="/search/{{r.keyword|urlencode}}/">{{r.keyword}}</a> &nbsp;&nbsp;&nbsp;&nbsp;
             {% endfor %}
             </p>
             <p class="tips2">

@@ -18,7 +18,10 @@ def smartcoffee(value, autoescape=True):
 
 @register.filter()
 def format_time(t):
-    d = datetime.datetime.strptime(t.split('.')[0], '%Y-%m-%dT%H:%M:%S')
+    if type(t) is datetime.datetime:
+        d = t
+    else:
+        d = datetime.datetime.strptime(t.split('.')[0], '%Y-%m-%dT%H:%M:%S')
     now = datetime.datetime.utcnow()
     dt = now - d
     if dt.days > 365:
