@@ -7,15 +7,14 @@ xiaoxia@xiaoxia.org
 """
 
 import hashlib
+import os
 import time
 import datetime
 import traceback
 import sys
 import json
-import metautils
 import socket
 import threading
-import MySQLdb as mdb
 from hashlib import sha1
 from random import randint
 from struct import unpack
@@ -23,10 +22,18 @@ from socket import inet_ntoa
 from threading import Timer, Thread
 from time import sleep
 from collections import deque
-from bencode import bencode, bdecode
 from Queue import Queue
 
+import MySQLdb as mdb
+try:
+    import libtorrent as lt
+    import ltMetadata
+except:
+    lt = None
+
+import metautils
 import simMetadata
+from bencode import bencode, bdecode
 
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
@@ -40,6 +47,8 @@ TID_LENGTH = 2
 RE_JOIN_DHT_INTERVAL = 3
 TOKEN_LENGTH = 2
 
+MAX_QUEUE_LT = 25
+MAX_QUEUE_PT = 200
 
 def entropy(length):
     return "".join(chr(randint(0, 255)) for _ in xrange(length))
@@ -128,7 +137,10 @@ class DHTClient(Thread):
                 self.send_find_node((node.ip, node.port), node.nid)
             except IndexError:
                 pass
-            sleep(wait)
+            try:
+                sleep(wait)
+            except KeyboardInterrupt:
+                os._exit(0)
 
     def process_find_node_response(self, msg, address):
         nodes = decode_nodes(msg["r"]["nodes"])
@@ -198,6 +210,7 @@ class DHTServer(DHTClient):
                     "token": token
                 }
             }
+            self.master.log_hash(infohash, address)
             self.send_krpc(msg, address)
         except KeyError:
             pass
@@ -214,7 +227,7 @@ class DHTServer(DHTClient):
                     port = address[1]
                 else:
                     port = msg["a"]["port"]
-                self.master.log(infohash, (address[0], port))
+                self.master.log_announce(infohash, (address[0], port))
         except Exception:
             print 'error'
             pass
@@ -260,11 +273,20 @@ class Master(Thread):
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8')
         self.n_reqs = self.n_valid = self.n_new = 0
+        self.n_downloading_lt = self.n_downloading_pt = 0
         self.visited = set()
 
     def got_torrent(self):
         utcnow = datetime.datetime.utcnow()
-        binhash, address, data = self.metadata_queue.get()
+        binhash, address, data, dtype, start_time = self.metadata_queue.get()
+        if dtype == 'pt':
+            self.n_downloading_pt -= 1
+        elif dtype == 'lt':
+            self.n_downloading_lt -= 1
+        if not data:
+            return
+        self.n_valid += 1
+
         try:
             info = self.parse_torrent(data)
             if not info:
@@ -300,7 +322,7 @@ class Master(Thread):
             del info['files']
 
         try:
-            print '\n', 'Saved', info['info_hash'], info['name'],
+            print '\n', 'Saved', info['info_hash'], dtype, info['name'], (time.time()-start_time), 's', address[0],
             ret = self.dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' + 
                 'length,create_time,last_seen,requests,comment,creator) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
                 (info['info_hash'], info['category'], info['data_hash'], info['name'], info['extension'], info['classified'],
@@ -320,12 +342,13 @@ class Master(Thread):
         while True:
             while self.metadata_queue.qsize() > 0:
                 self.got_torrent()
-            address, binhash = self.queue.get()
+            address, binhash, dtype = self.queue.get()
             if binhash in self.visited:
                 continue
             if len(self.visited) > 100000:
                 self.visited = set()
             self.visited.add(binhash)
+
             self.n_reqs += 1
             info_hash = binhash.encode('hex')
 
@@ -340,19 +363,25 @@ class Master(Thread):
                 self.n_valid += 1
                 # 更新最近发现时间，请求数
                 self.dbcurr.execute('UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (utcnow, info_hash))
-                sys.stdout.write('+')
-                sys.stdout.flush()
-                self.dbconn.commit()
             else:
-                t = threading.Thread(target = simMetadata.download_metadata, args = (address, binhash, self.metadata_queue))
-                t.setDaemon(True)
-                t.start()
+                if dtype == 'pt':
+                    t = threading.Thread(target=simMetadata.download_metadata, args=(address, binhash, self.metadata_queue))
+                    t.setDaemon(True)
+                    t.start()
+                    self.n_downloading_pt += 1
+                elif dtype == 'lt' and self.n_downloading_lt < MAX_QUEUE_LT:
+                    t = threading.Thread(target=ltMetadata.download_metadata, args=(address, binhash, self.metadata_queue))
+                    t.setDaemon(True)
+                    t.start()
+                    self.n_downloading_lt += 1
 
-            if self.n_reqs >= 50:
+            if self.n_reqs >= 1000:
                 self.dbcurr.execute('INSERT INTO search_statusreport(date,new_hashes,total_requests, valid_requests)  VALUES(%s,%s,%s,%s) ON DUPLICATE KEY UPDATE ' +
                     'total_requests=total_requests+%s, valid_requests=valid_requests+%s, new_hashes=new_hashes+%s',
                     (date, self.n_new, self.n_reqs, self.n_valid, self.n_reqs, self.n_valid, self.n_new))
                 self.dbconn.commit()
+                print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(), 
+                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt,
                 self.n_reqs = self.n_valid = self.n_new = 0
 
     def decode(self, s):
@@ -377,6 +406,8 @@ class Master(Thread):
         self.encoding = 'utf8'
         try:
             torrent = bdecode(data)
+            if not torrent.get('name'):
+                return None
         except:
             return None
         try:
@@ -421,11 +452,17 @@ class Master(Thread):
         return info
 
 
-    def log(self, infohash, address=None):
-        self.queue.put([address, infohash])
+    def log_announce(self, binhash, address=None):
+        self.queue.put([address, binhash, 'pt'])
+
+    def log_hash(self, binhash, address=None):
+        if not lt:
+            return
+        if self.n_downloading_lt < MAX_QUEUE_LT:
+            self.queue.put([address, binhash, 'lt'])
+
 
 if __name__ == "__main__":
-    
     # max_node_qsize bigger, bandwith bigger, spped higher
     master = Master()
     master.start()
@@ -433,3 +470,5 @@ if __name__ == "__main__":
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
     dht.start()
     dht.auto_send_find_node()
+
+

@@ -7,8 +7,10 @@ from socket import inet_ntoa
 from threading import Timer, Thread
 from time import sleep, time
 from hashlib import sha1
-from simDHT import entropy
+
+from simdht_worker import entropy
 from bencode import bencode, bdecode
+
 
 BT_PROTOCOL = "BitTorrent protocol"
 BT_MSG_ID = 20
@@ -95,6 +97,8 @@ def recvall(the_socket, timeout=5):
     return "".join(total_data)
 
 def download_metadata(address, infohash, metadata_queue, timeout=5):
+    metadata = None
+    start_time = time()
     try:
         the_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         the_socket.settimeout(5)
@@ -124,9 +128,7 @@ def download_metadata(address, infohash, metadata_queue, timeout=5):
             metadata.append(packet[packet.index("ee")+2:])
 
         metadata = "".join(metadata)
-
         #print 'Fetched', bdecode(metadata)["name"], "size: ", len(metadata)
-        metadata_queue.put((infohash, address, metadata))
 
     except socket.timeout:
         pass
@@ -135,3 +137,5 @@ def download_metadata(address, infohash, metadata_queue, timeout=5):
 
     finally:
         the_socket.close()
+        metadata_queue.put((infohash, address, metadata, 'pt', start_time))
+

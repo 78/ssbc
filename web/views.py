@@ -64,7 +64,7 @@ def search(request, keyword=None, p=None):
                 if x['id'] == y['id']:
                     x.update(y)
                     x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
-                    x['maybe_fake'] = x['name'].endswith(u'.rar')
+                    x['maybe_fake'] = x['name'].endswith(u'.rar') or u'BTtiantang.com' in x['name'] or u'liangzijie' in x['name']
                     if 'files' in x:
                         x['files'] = [z for z in x['files'] if not z['path'].startswith(u'_')][:5]
                         x['files'].sort(key=lambda x:x['length'], reverse=True)
