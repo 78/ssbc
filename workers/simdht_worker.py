@@ -26,6 +26,7 @@ from Queue import Queue
 
 import MySQLdb as mdb
 try:
+    raise
     import libtorrent as lt
     import ltMetadata
 except:
@@ -322,7 +323,10 @@ class Master(Thread):
             del info['files']
 
         try:
-            print '\n', 'Saved', info['info_hash'], dtype, info['name'], (time.time()-start_time), 's', address[0],
+            try:
+                print '\n', 'Saved', info['info_hash'], dtype, info['name'], (time.time()-start_time), 's', address[0],
+            except:
+                print '\n', 'Saved', info['info_hash'],
             ret = self.dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' + 
                 'length,create_time,last_seen,requests,comment,creator) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
                 (info['info_hash'], info['category'], info['data_hash'], info['name'], info['extension'], info['classified'],
