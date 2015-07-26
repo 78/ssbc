@@ -6,7 +6,7 @@ class TimerMiddleware:
 
     def process_response(self, request, response):
         if not hasattr(request, "_tm_start_time"):
-            return
+            return response
 
         total = (time() - request._tm_start_time) * 1000
 

@@ -41,6 +41,8 @@ def hash(request, h):
 
 @cache_page(1800)
 def search(request, keyword=None, p=None):
+    if not keyword:
+        return redirect('/')
     if politics.is_sensitive(keyword):
         return redirect('/?' + urllib.urlencode({'notallow': keyword.encode('utf8')}))
     d = {'keyword': keyword}
