@@ -3,46 +3,46 @@ import re
 import datetime
 import sys
 import urllib
-import requests
-import workers.metautils
+
 from django.http import Http404
+from django.views.decorators.cache import cache_page
 from django.shortcuts import render, redirect
 
 from lib import politics
+import workers.metautils
+from search.models import RecKeywords, Hash
 
-API_URL = 'http://127.0.0.1:8001/api/'
-API_HOST = 'www.shousibaocai.com'
 re_punctuations = re.compile(
     u"。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]")
-req_session = requests.Session()
 
-# Create your views here.
+
+@cache_page(600)
 def index(request):
-    reclist = ['速度与激情7','王牌特工','战狼','左耳','咱们结婚吧']
-    d = {'reclist': reclist}
-    return render(request, 'index.html', d)
+    reclist = RecKeywords.objects.order_by('-order')
+    return render(request, 'index.html', {'reclist': reclist})
 
+
+@cache_page(3600*24)
 def hash(request, h):
-    qs = {
-        'hashes': h,
-    }
-    url = API_URL + 'json_info?' + urllib.urlencode(qs)
-    r = req_session.get(url, headers={'Host':API_HOST})
     try:
-        j = r.json()
+        res = Hash.objects.list_with_files([h])
+        j = res[0]
     except:
         raise Http404(sys.exc_info()[1])
-    d = {'info': j[h]} 
+    d = {'info': j} 
     d['keywords'] = list(set(re_punctuations.sub(u' ', d['info']['name']).split()))
     if 'files' in d['info']:
         d['info']['files'] = [y for y in d['info']['files'] if not y['path'].startswith(u'_')]
         d['info']['files'].sort(key=lambda x:x['length'], reverse=True)
     d['magnet_url'] = 'magnet:?xt=urn:btih:' + d['info']['info_hash'] + '&' + urllib.urlencode({'dn':d['info']['name'].encode('utf8')})
-    d['download_url'] = 'http://www.so.com/s?' + urllib.urlencode({'ie':'utf-8', 'src': 'ssbc', 'q': d['info']['name'].encode('utf8')})
+    d['download_url'] = 'http://www.haosou.com/s?' + urllib.urlencode({'ie':'utf-8', 'src': 'ssbc', 'q': d['info']['name'].encode('utf8')})
     return render(request, 'info.html', d)
 
 
+@cache_page(1800)
 def search(request, keyword=None, p=None):
+    if not keyword:
+        return redirect('/')
     if politics.is_sensitive(keyword):
         return redirect('/?' + urllib.urlencode({'notallow': keyword.encode('utf8')}))
     d = {'keyword': keyword}
@@ -55,35 +55,23 @@ def search(request, keyword=None, p=None):
     d['sort'] = request.GET.get('s', 'create_time')
     d['ps'] = 10
     d['offset'] = d['ps']*(d['p']-1)
-    # Fetch list
-    qs = {
-        'keyword': keyword.encode('utf8'),
-        'count': d['ps'],
-        'start': d['offset'],
-        'category': d['category'],
-        'sort': d['sort'],
-    }
-    url = API_URL + 'json_search?' + urllib.urlencode(qs)
-    r = req_session.get(url, headers={'Host':API_HOST})
-    d.update(r.json())
+    res = Hash.objects.search(keyword, d['offset'], d['ps'], d['category'], d['sort'])
+    d.update(res)
     # Fill info
-    ids = '-'.join([str(x['id']) for x in d['result']['items']])
+    ids = [str(x['id']) for x in d['result']['items']]
     if ids:
-        qs = {
-            'hashes': ids,
-        }
-        url = API_URL + 'json_info?' + urllib.urlencode(qs)
-        r = req_session.get(url, headers={'Host':API_HOST})
-        j = r.json()
-
+        items = Hash.objects.list_with_files(ids)
         for x in d['result']['items']:
-            x.update(j[str(x['id'])])
-            x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
-            if 'files' in x:
-                x['files'] = [y for y in x['files'] if not y['path'].startswith(u'_')][:5]
-                x['files'].sort(key=lambda x:x['length'], reverse=True)
-            else:
-                x['files'] = [{'path': x['name'], 'length': x['length']}]
+            for y in items:
+                if x['id'] == y['id']:
+                    x.update(y)
+                    x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
+                    x['maybe_fake'] = x['name'].endswith(u'.rar') or u'BTtiantang.com' in x['name'] or u'liangzijie' in x['name']
+                    if 'files' in x:
+                        x['files'] = [z for z in x['files'] if not z['path'].startswith(u'_')][:5]
+                        x['files'].sort(key=lambda x:x['length'], reverse=True)
+                    else:
+                        x['files'] = [{'path': x['name'], 'length': x['length']}]
     # pagination
     w = 10
     total = int(d['result']['meta']['total_found'])
@@ -102,12 +90,16 @@ def search(request, keyword=None, p=None):
         
     return render(request, 'list.html', d)
 
+
 def hash_old(request, h):
     return redirect('/hash/' + h, permanent=True)
+
 
 def search_old(request, kw, p):
     return redirect('list', kw, p)
 
-def search_list(request, kw, p):
-    return search(request, kw, p)
+
+@cache_page(3600*24)
+def howto(request):
+    return render(request, 'howto.html', {})
 

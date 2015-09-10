@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{keyword}} 下载 - 磁力搜索{% endblock %}
+{% block title %}{{keyword}} 磁力链接 - 磁力搜索{% endblock %}
 {% block metas %}
 {{block.super}}
 <meta name="keywords" content="{{keyword}},磁力链接,BT下载,迅雷下载,在线播放,磁力搜索" />
-<meta name="description" content="查看关于{{keyword}}的热门资源" />
+<meta name="description" content="{{keyword}}的磁力链接" />
 {% endblock %}
 
 {% block content %}
@@ -53,6 +53,9 @@
             &nbsp; &nbsp;
             <a class="title" href="{{x.magnet_url}}"><span class="glyphicon glyphicon-magnet"></span> 磁力链接</a>
             &nbsp; &nbsp;
+            {% if x.maybe_fake %}
+                <span class="label label-warning">可能是假的</span>
+            {% endif %}
         </div>
     </td></tr>
     {% endfor %}

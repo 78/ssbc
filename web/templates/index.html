@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
-{% block title %}手撕包菜 - 磁力搜索_收录最快的DHT搜索引擎{% endblock %}
+{% block title %}手撕包菜 - 收录最快的磁力链接搜索引擎{% endblock %}
 {% block metas %}
 {{block.super}}
 <meta name="keywords" content="磁力搜索,磁力链接,种子搜索网站,BT搜索,DHT搜索">
-<meta name="description" content="磁力搜索(手撕包菜)是一个专业提供DHT磁力资源搜索和下载的网站，索引全网上千万BT种子的磁力链接来提供搜索，又被誉为BT种子搜索神器。也是国内最大的磁力链接的发现和分享社区。">
+<meta name="description" content="磁力搜索(手撕包菜)是一个专业提供磁力连接搜索的网站，索引全网上千万磁力链接，又被誉为BT种子搜索神器。也是国内最大的磁力链接的发现和分享社区。">
 {% endblock %}
 
 {% block content %}
@@ -23,15 +23,15 @@
         </div>
         <div class="good">
             <p>
-            {% for kw in reclist%}
-                <a href="/list/{{kw|urlencode}}/">{{kw}}</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            {% for r in reclist%}
+                <a href="/search/{{r.keyword|urlencode}}/">{{r.keyword}}</a> &nbsp;&nbsp;&nbsp;&nbsp;
             {% endfor %}
             </p>
             <p class="tips2">
                 <!--
                 <span style="color:red;">资源交流群：102900082(满)  网站建设群：178886628Q（限忠实粉丝加群，白菜勿进）</span>
                 -->
-                <a href="http://jingyan.baidu.com/article/642c9d34c2bca2644a46f72b.html">磁力链接如何转换成种子？</a>
+                <p><a href="/howto/">如何免费在线播放磁力链接？</a>
             </p>
         </div>
         <div class="div-ads-front" style="margin-top: 40px; text-align:center; margin-left: 0px;">
