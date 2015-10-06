@@ -8,6 +8,7 @@ xiaoxia@xiaoxia.org
 
 import hashlib
 import os
+import SimpleXMLRPCServer
 import time
 import datetime
 import traceback
@@ -24,6 +25,7 @@ from time import sleep
 from collections import deque
 from Queue import Queue
 
+import pygeoip
 import MySQLdb as mdb
 try:
     raise
@@ -31,10 +33,12 @@ try:
     import ltMetadata
 except:
     lt = None
+    print sys.exc_info()[1]
 
 import metautils
 import simMetadata
 from bencode import bencode, bdecode
+from metadata import save_metadata
 
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
@@ -50,6 +54,12 @@ TOKEN_LENGTH = 2
 
 MAX_QUEUE_LT = 25
 MAX_QUEUE_PT = 200
+
+geoip = pygeoip.GeoIP('GeoIP.dat')
+
+
+def is_ip_allowed(ip):
+    return geoip.country_code_by_addr(ip) not in ('CN','TW','HK')
 
 def entropy(length):
     return "".join(chr(randint(0, 255)) for _ in xrange(length))
@@ -278,7 +288,6 @@ class Master(Thread):
         self.visited = set()
 
     def got_torrent(self):
-        utcnow = datetime.datetime.utcnow()
         binhash, address, data, dtype, start_time = self.metadata_queue.get()
         if dtype == 'pt':
             self.n_downloading_pt -= 1
@@ -288,55 +297,7 @@ class Master(Thread):
             return
         self.n_valid += 1
 
-        try:
-            info = self.parse_torrent(data)
-            if not info:
-                return
-        except:
-            traceback.print_exc()
-            return
-        info_hash = binhash.encode('hex')
-        info['info_hash'] = info_hash
-        # need to build tags
-        info['tagged'] = False
-        info['classified'] = False
-        info['requests'] = 1
-        info['last_seen'] = utcnow
-        info['source_ip'] = address[0]
-
-        if info.get('files'):
-            files = [z for z in info['files'] if not z['path'].startswith('_')]
-            if not files:
-                files = info['files']
-        else:
-            files = [{'path': info['name'], 'length': info['length']}]
-        files.sort(key=lambda z:z['length'], reverse=True)
-        bigfname = files[0]['path']
-        info['extension'] = metautils.get_extension(bigfname).lower()
-        info['category'] = metautils.get_category(info['extension'])
-
-        if 'files' in info:
-            try:
-                self.dbcurr.execute('INSERT INTO search_filelist VALUES(%s, %s)', (info['info_hash'], json.dumps(info['files'])))
-            except:
-                print self.name, 'insert error', sys.exc_info()[1]
-            del info['files']
-
-        try:
-            try:
-                print '\n', 'Saved', info['info_hash'], dtype, info['name'], (time.time()-start_time), 's', address[0],
-            except:
-                print '\n', 'Saved', info['info_hash'],
-            ret = self.dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' + 
-                'length,create_time,last_seen,requests,comment,creator) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-                (info['info_hash'], info['category'], info['data_hash'], info['name'], info['extension'], info['classified'],
-                info['source_ip'], info['tagged'], info['length'], info['create_time'], info['last_seen'], info['requests'],
-                info.get('comment',''), info.get('creator','')))
-            self.dbconn.commit()
-        except:
-            print self.name, 'save error', self.name, info
-            traceback.print_exc()
-            return
+        save_metadata(self.dbcurr, binhash, address, start_time, data)
         self.n_new += 1
 
 
@@ -385,76 +346,8 @@ class Master(Thread):
                     (date, self.n_new, self.n_reqs, self.n_valid, self.n_reqs, self.n_valid, self.n_new))
                 self.dbconn.commit()
                 print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(), 
-                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt,
+                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt, 
                 self.n_reqs = self.n_valid = self.n_new = 0
-
-    def decode(self, s):
-        if type(s) is list:
-            s = ';'.join(s)
-        u = s
-        for x in (self.encoding, 'utf8', 'gbk', 'big5'):
-            try:
-                u = s.decode(x)
-                return u
-            except:
-                pass
-        return s.decode(self.encoding, 'ignore')
-
-    def decode_utf8(self, d, i):
-        if i+'.utf-8' in d:
-            return d[i+'.utf-8'].decode('utf8')
-        return self.decode(d[i])
-
-    def parse_torrent(self, data):
-        info = {}
-        self.encoding = 'utf8'
-        try:
-            torrent = bdecode(data)
-            if not torrent.get('name'):
-                return None
-        except:
-            return None
-        try:
-            info['create_time'] = datetime.datetime.fromtimestamp(float(torrent['creation date']))
-        except:
-            info['create_time'] = datetime.datetime.utcnow()
-
-        if torrent.get('encoding'):
-            self.encoding = torrent['encoding']
-        if torrent.get('announce'):
-            info['announce'] = self.decode_utf8(torrent, 'announce')
-        if torrent.get('comment'):
-            info['comment'] = self.decode_utf8(torrent, 'comment')[:200]
-        if torrent.get('publisher-url'):
-            info['publisher-url'] = self.decode_utf8(torrent, 'publisher-url')
-        if torrent.get('publisher'):
-            info['publisher'] = self.decode_utf8(torrent, 'publisher')
-        if torrent.get('created by'):
-            info['creator'] = self.decode_utf8(torrent, 'created by')[:15]
-
-        if 'info' in torrent:
-            detail = torrent['info'] 
-        else:
-            detail = torrent
-        info['name'] = self.decode_utf8(detail, 'name')
-        if 'files' in detail:
-            info['files'] = []
-            for x in detail['files']:
-                if 'path.utf-8' in x:
-                    v = {'path': self.decode('/'.join(x['path.utf-8'])), 'length': x['length']}
-                else:
-                    v = {'path': self.decode('/'.join(x['path'])), 'length': x['length']}
-                if 'filehash' in x:
-                    v['filehash'] = x['filehash'].encode('hex')
-                info['files'].append(v)
-            info['length'] = sum([x['length'] for x in info['files']])
-        else:
-            info['length'] = detail['length']
-        info['data_hash'] = hashlib.md5(detail['pieces']).hexdigest()
-        if 'profiles' in detail:
-            info['profiles'] = detail['profiles']
-        return info
-
 
     def log_announce(self, binhash, address=None):
         self.queue.put([address, binhash, 'pt'])
@@ -462,14 +355,33 @@ class Master(Thread):
     def log_hash(self, binhash, address=None):
         if not lt:
             return
+        if is_ip_allowed(address[0]):
+            return
         if self.n_downloading_lt < MAX_QUEUE_LT:
             self.queue.put([address, binhash, 'lt'])
+
+
+def announce(info_hash, address):
+    binhash = info_hash.decode('hex')
+    master.log_announce(binhash, address)
+    return 'ok'
+
+
+def rpc_server():
+    rpcserver = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 8004), logRequests=False)
+    rpcserver.register_function(announce, 'announce')
+    print 'Starting xml rpc server...'
+    rpcserver.serve_forever()
 
 
 if __name__ == "__main__":
     # max_node_qsize bigger, bandwith bigger, spped higher
     master = Master()
     master.start()
+
+    rpcthread = threading.Thread(target=rpc_server)
+    rpcthread.setDaemon(True)
+    rpcthread.start()
 
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
     dht.start()

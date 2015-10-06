@@ -40,6 +40,7 @@ def json_status(request):
     d['hash_total'] = Hash.objects.count()
     reports = StatusReport.objects.order_by('-date')[:30]
     d['reports'] = list(reports.values())
+    print request.META
     return JsonResponse(d)
 
 
@@ -49,9 +50,9 @@ def json_helper(request):
     j = {
         'ret': 0,
         'hot_keywords': kwlist,
-        'tips': u'手撕包菜搜索助手1.0 <a href="http://www.shousibaocai.com/" target="_blank">磁力搜索</a>',
+        'tips': u'手撕包菜搜索助手1.2  <a href="http://pan.baidu.com/">登录百度云</a>，即可使用云播放在线观看',
         'default_option': False,
-        'default_url': '', #'http://www.2345.com/?26782',
+        'default_url': 'http://www.2345.com/?26782',
         'update_url': '',
         'version': '',
     }

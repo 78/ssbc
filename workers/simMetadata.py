@@ -101,7 +101,7 @@ def download_metadata(address, infohash, metadata_queue, timeout=5):
     start_time = time()
     try:
         the_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        the_socket.settimeout(5)
+        the_socket.settimeout(timeout)
         the_socket.connect(address)
 
         # handshake

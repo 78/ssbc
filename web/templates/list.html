@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{keyword}} 磁力链接 - 磁力搜索{% endblock %}
+{% block title %}{{keyword}} 磁力链接 - 磁力巴巴{% endblock %}
 {% block metas %}
 {{block.super}}
 <meta name="keywords" content="{{keyword}},磁力链接,BT下载,迅雷下载,在线播放,磁力搜索" />
@@ -51,7 +51,13 @@
             {% if x.category == 'video' %}
             {% endif %}
             &nbsp; &nbsp;
-            <a class="title" href="{{x.magnet_url}}"><span class="glyphicon glyphicon-magnet"></span> 磁力链接</a>
+            <a class="title" style="display:none;" rel="nofollow" href="{{x.magnet_url}}"><span class="glyphicon glyphicon-magnet"></span> 磁力链接</a>
+            &nbsp; &nbsp;
+            <a class="title x-play" style="display:none;" rel="nofollow" 
+                href="http://pan.baidu.com/disk/home?ssbc_magnet={{x.info_hash}}"
+                data-url="http://pan.baidu.com/disk/home?ssbc_magnet={{x.info_hash}}"
+                target="_blank">
+                <span class="glyphicon glyphicon-play"></span> 在线观看</a>
             &nbsp; &nbsp;
             {% if x.maybe_fake %}
                 <span class="label label-warning">可能是假的</span>

@@ -1,9 +1,10 @@
 {% extends 'layout.html' %}
-{% block title %}手撕包菜 - 收录最快的磁力链接搜索引擎{% endblock %}
+{% load staticfiles %}
+{% block title %}磁力搜索_磁力链接_种子搜索_番号搜索-磁力巴巴{% endblock %}
 {% block metas %}
 {{block.super}}
-<meta name="keywords" content="磁力搜索,磁力链接,种子搜索网站,BT搜索,DHT搜索">
-<meta name="description" content="磁力搜索(手撕包菜)是一个专业提供磁力连接搜索的网站，索引全网上千万磁力链接，又被誉为BT种子搜索神器。也是国内最大的磁力链接的发现和分享社区。">
+<meta name="keywords" content="磁力巴巴,cilibaba,磁力助手,手撕包菜,磁力搜索,磁力链接,种子搜索网站,BT搜索,DHT搜索,番号搜索">
+<meta name="description" content="磁力巴巴是一个专业提供磁力连接搜索的网站，索引全网上千万磁力链接，可以使用迅雷、百度云等下载磁力链接的内容。">
 {% endblock %}
 
 {% block content %}
@@ -11,7 +12,7 @@
 <div class="container">
     <div class="div-search-box col-lg-offset-2 col-lg-8">
         <div class="logo">
-            <img src="/static/ssbc.png" />
+            <img src="{% static 'cilibaba.png' %}" />
         </div>
         <div>
             <div class="input-group">
@@ -28,9 +29,6 @@
             {% endfor %}
             </p>
             <p class="tips2">
-                <!--
-                <span style="color:red;">资源交流群：102900082(满)  网站建设群：178886628Q（限忠实粉丝加群，白菜勿进）</span>
-                -->
                 <p><a href="/howto/">如何免费在线播放磁力链接？</a>
             </p>
         </div>
@@ -39,7 +37,6 @@
     </div>
 </div>
 </form>
-
 {% include 'foot.html' %}
 {% endblock %}
 
@@ -50,9 +47,21 @@ $(function(){
     $('.x-kw').focus();
 });
 
+$('.x-m-ok').click(function(){
+    ga('send', 'event', 'ads', 'click', 'ok', {'hitCallback': function(){
+        window.location = '/yunhelper/';
+    }});
+    return false;
+});
+$('.x-m-cancel').click(function(){
+    ga('send', 'event', 'ads', 'click', 'cancel');
+    return true;
+});
 setTimeout(function(){
     $('.good').fadeIn('slow');
 }, 500);
+
+
 </script>
 {% endblock %}
 

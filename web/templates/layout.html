@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}磁力搜索{% endblock %}
+{% load staticfiles %}
+
+{% block title %}磁力巴巴{% endblock %}
 
 {% block metas %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -8,8 +10,8 @@
 
 {% block styles %}
 {{block.super}}
-<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
-<link rel="stylesheet" type="text/css" href="/static/css/ssbc.css?v=0716" />
+<link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/ssbc.css' %}" />
 {% endblock %}
 
 {% block navbar %}
@@ -23,11 +25,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             </button>
-            <a title="手撕包菜 收录最快的DHT搜索引擎" alt="shousibaocai" class="navbar-brand" href="{% url 'index' %}">手撕包菜</a>
+            <a title="磁力巴巴 收录最快的DHT搜索引擎" alt="shousibaocai" class="navbar-brand" href="{% url 'index' %}">磁力巴巴</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-            <li class="active"><a href="{% url 'index' %}">磁力搜索</a></li>
+                <li class="active"><a href="{% url 'index' %}">磁力搜索</a></li>
+                <li><a href="/yunhelper/">搜索助手</a></li>
             </ul>
 
             {% if request.path != '/' %}
@@ -45,6 +48,9 @@
 </nav>
 </form>
 
+<div class="alert alert-info" style="text-align:center; margin-top: -20px;">
+    请记住手撕包菜的新网址：www.cilibaba.com 。
+</div>
 {% endblock %}
 
 {% block content %}
@@ -54,10 +60,10 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.0.min.js"></script>
-<script src="//ajax.aspnetcdn.com/ajax/bootstrap/3.1.1/bootstrap.min.js"></script>
-<script src="/static/js/bootstrap-typeahead.min.js"></script>
-<script src="/static/js/ssbc.js?v=12"></script>
+<script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-typeahead.min.js'%}"></script>
+<script src="{% static 'js/ssbc.js' %}"></script>
 {% include 'analytics.html' %}
 {% endblock %}
 

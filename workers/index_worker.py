@@ -26,9 +26,10 @@ dst_curr = dst_conn.cursor()
 dst_curr.execute('SET NAMES utf8')
 
 def work():
-    src_curr.execute('SELECT id, name, category, length, UNIX_TIMESTAMP(create_time) AS create_time, ' +
+    src_curr.execute('SELECT id, name, CRC32(category) AS category, length, UNIX_TIMESTAMP(create_time) AS create_time, ' +
         'UNIX_TIMESTAMP(last_seen) AS last_seen FROM search_hash WHERE tagged=false LIMIT 10000')
-    print 'fetched', src_curr.rowcount
+    total = src_curr.rowcount
+    print 'fetched', total
     for one in src_curr:
         ret = dst_curr.execute('insert into rt_main(id,name,category,length,create_time,last_seen) values(%s,%s,%s,%s,%s,%s)',
             (one['id'], one['name'], one['category'], one['length'], one['create_time'], one['last_seen']))
@@ -36,10 +37,13 @@ def work():
             src_curr.execute('UPDATE search_hash SET tagged=True WHERE id=%s', (one['id'],))
             print 'Indexed', one['name'].encode('utf8')
     print 'Done!'
+    return total
 
 if __name__ == '__main__':
     while True:
-        work()
+        if work() == 10000:
+            print 'Continue...'
+            continue
         print 'Wait 10mins...'
         time.sleep(600)
 
