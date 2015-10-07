@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{keyword}} 磁力链接 - 磁力巴巴{% endblock %}
+{% block title %}{{keyword}} Results - CiLiBaBa{% endblock %}
 {% block metas %}
 {{block.super}}
-<meta name="keywords" content="{{keyword}},磁力链接,BT下载,迅雷下载,在线播放,磁力搜索" />
-<meta name="description" content="{{keyword}}的磁力链接" />
+<meta name="keywords" content="{{keyword}},磁力链接,CiLiBaBa" />
+<meta name="description" content="{{keyword}} magnet links and bittorrent files." />
 {% endblock %}
 
 {% block content %}
@@ -14,25 +14,27 @@
     </div>
 
 {% load filters %}
-<h4>共找到 {{result.meta.total_found}} 条关于 {{keyword}} 的结果，耗时 {{result.meta.time}} 秒.</h4>
+<h4>Found {{result.meta.total_found}} items for {{keyword}} in {{result.meta.time}}s.</h4>
 <p>
     <div class="btn-group" role="group">
     {% for x in cats_navs %}
-        <a class="btn btn-default {% ifequal x.value category%}active{%endifequal%}" href="./?c={{x.value}}&s={{sort}}">{{x.name}} ({{x.num}})</a>
+        <a class="btn btn-default {% ifequal x.value category%}active{%endifequal%}" href="./?c={{x.value}}&s={{sort}}" rel="nofollow">{{x.name}}
+        {% ifnotequal x.name 'All'%} ({{x.num}}){%endifnotequal%}</a>
     {% endfor %}
     </div>
     <div class="pull-right btn-group" role="group">
     {% for x in sort_navs %}
-        <a class="btn btn-default {% ifequal x.value sort %}active{%endifequal%}" href="./?c={{category}}&s={{x.value}}">{{x.name}}</a>
+        <a class="btn btn-default {% ifequal x.value sort %}active{%endifequal%}" href="./?c={{category}}&s={{x.value}}" rel="nofollow">{{x.name}}</a>
     {% endfor %}
     </div>
 </p>
+{% if result.items %}
 <table class="table">
     {% for x in result.items %}
     <tr><td class="x-item">
         <div>
             <a title="{{x.name}}" class="title" href="{% url 'hash' x.id%}">{{x.name|highlight:words}}</a>
-            <span class="ctime">{{x.create_time|format_time}}</span>
+            <span class="ctime">{{x.create_time|timesince}}</span>
         </div>
         <div class="files">
             <ul>
@@ -47,26 +49,43 @@
             </ul>
         </div>
         <div class="tail">
-            文件数: {{x.files|length}} 大小: {{x.length|filesizeformat}}  请求数: {{x.requests}} 更新时间: {{x.last_seen|format_time}}
+            Files: {{x.files|length}} Total size: {{x.length|filesizeformat}}  Total requests: {{x.requests}} Last access time: {{x.last_seen|timesince}}
             {% if x.category == 'video' %}
             {% endif %}
             &nbsp; &nbsp;
-            <a class="title" style="display:none;" rel="nofollow" href="{{x.magnet_url}}"><span class="glyphicon glyphicon-magnet"></span> 磁力链接</a>
+            <a class="title" style="display:none;" rel="nofollow" href="{{x.magnet_url}}"><span class="glyphicon glyphicon-magnet"></span> MagnetLink</a>
             &nbsp; &nbsp;
             <a class="title x-play" style="display:none;" rel="nofollow" 
                 href="http://pan.baidu.com/disk/home?ssbc_magnet={{x.info_hash}}"
                 data-url="http://pan.baidu.com/disk/home?ssbc_magnet={{x.info_hash}}"
                 target="_blank">
-                <span class="glyphicon glyphicon-play"></span> 在线观看</a>
+                <span class="glyphicon glyphicon-play"></span> Play</a>
             &nbsp; &nbsp;
             {% if x.maybe_fake %}
-                <span class="label label-warning">可能是假的</span>
+                <span class="label label-warning">could be FAKE!!!</span>
             {% endif %}
         </div>
     </td></tr>
     {% endfor %}
 </table>
 {% include 'pagination.html' %}
+{% else %}
+    {% if '夏洛特' in keyword %}
+    <p class="well">
+        1. <a target="_blank" href="http://yun.baidu.com/s/1kTCOsvH" rel="nofollow">夏洛特烦恼TC.mkv 百度云在线观看</a>
+    </p>
+    {% endif %}
+        Sorry, not found "{{keyword}}" in the DHT network. Please try it later :)
+    <div class="recommendation" style="margin-top: 30px;">
+        <h4>See what other people search...</h4>
+        <p>
+        {% for x in keyword_logs.latest|slice:":100" %}
+            <a href="{% url 'list' x.keyword '' %}">{{x.keyword}}</a>
+        {% endfor %}
+        </p>
+    </div>
+
+{% endif %}
 
 </div>
 {% include 'foot.html' %}
@@ -75,6 +94,9 @@
 {% block scripts %}
 {{block.super}}
 <script>
+{% ifequal p 1 %}
+    $.get("{% url 'top_log'%}?type=keyword&keyword={{keyword|urlencode}}");
+{% endifequal %}
 </script>
 {% endblock %}
 

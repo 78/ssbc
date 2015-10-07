@@ -3,18 +3,18 @@ import os
 import binascii
 
 cats = {
-    u'video': u'视频',
-    u'image': u'图片',
-    u'document': u'书籍',
-    u'music': u'音乐',
-    u'package': u'压缩',
-    u'software': u'软件',
+    u'video': u'Videos',
+    u'image': u'Images',
+    u'document': u'Books',
+    u'music': u'Musics',
+    u'package': u'Packages',
+    u'software': u'Softwares',
 }
 
 def get_label(name):
     if name in cats:
         return cats[name]
-    return u'其它'
+    return u'Others'
 
 def get_label_by_crc32(n):
     for k in cats:

@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect
 
 from lib import politics
 import workers.metautils
+from top.models import KeywordLog
 from search.models import RecKeywords, Hash
 
 re_punctuations = re.compile(
@@ -27,8 +28,8 @@ def hash(request, h):
     try:
         res = Hash.objects.list_with_files([h])
         j = res[0]
-    except:
-        raise Http404(sys.exc_info()[1])
+    except Exception as e:
+        raise Http404(str(e))
     d = {'info': j} 
     d['keywords'] = list(set(re_punctuations.sub(u' ', d['info']['name']).split()))
     if 'files' in d['info']:
@@ -66,7 +67,7 @@ def search(request, keyword=None, p=None):
                 if x['id'] == y['id']:
                     x.update(y)
                     x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
-                    x['maybe_fake'] = x['name'].endswith(u'.rar') or u'BTtiantang.com' in x['name'] or u'liangzijie' in x['name']
+                    x['maybe_fake'] = x['name'].endswith(u'.rar') or u'BTtiantang.com' in x['name'] or u'liangzijie' in x['name'] or u'720p高清视频' in x['name']
                     if 'files' in x:
                         x['files'] = [z for z in x['files'] if not z['path'].startswith(u'_')][:5]
                         x['files'].sort(key=lambda x:x['length'], reverse=True)
@@ -79,11 +80,12 @@ def search(request, keyword=None, p=None):
     d['prev_pages'] = range( max(d['p']-w+min(int(w/2), d['page_max']-d['p']),1), d['p'])
     d['next_pages'] = range( d['p']+1, int(min(d['page_max']+1, max(d['p']-w/2,1) + w )) )
     d['sort_navs'] = [
-        {'name': '按收录时间', 'value': 'create_time'},
-        {'name': '按文件大小', 'value': 'length'},
-        {'name': '按相关性', 'value': 'relavance'},
+        {'name': 'By Time', 'value': 'create_time'},
+        {'name': 'By Size', 'value': 'length'},
+        {'name': 'By Relavance', 'value': 'relavance'},
     ]
-    d['cats_navs'] = [{'name': '全部', 'num': total, 'value': ''}]
+    d['cats_navs'] = [{'name': 'All', 'num': total, 'value': ''}]
+    d['keyword_logs'] = KeywordLog.objects
     for x in d['cats']['items']:
         v = workers.metautils.get_label_by_crc32(x['category'])
         d['cats_navs'].append({'value': v, 'name': workers.metautils.get_label(v), 'num': x['num']})

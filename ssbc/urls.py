@@ -19,7 +19,7 @@ from django.contrib import admin
 import web.views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^top/', include('top.urls')),
     url(r'^api/', include('search.urls')),
     url(r'^$', web.views.index, name='index'),
     url(r'^info/(\d{1,10})$', web.views.hash, name='hash'),
@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^search/(.*?)$', web.views.search),
     url(r'^list/(.+?)/(\d*)$', web.views.search_old),
     url(r'^howto/$', web.views.howto, name='howto'),
+    url(r'^admin/', include(admin.site.urls)),
 ]

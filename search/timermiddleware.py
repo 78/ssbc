@@ -1,3 +1,6 @@
+# coding: utf-8
+import traceback
+from django.conf import settings
 from time import time
 
 class TimerMiddleware:
@@ -17,3 +20,9 @@ class TimerMiddleware:
         response['X-Request-Time'] = '%fsms' % total
         return response
 
+
+class ProcessExceptionMiddleware(object):
+    def process_response(self, request, response):
+        if response.status_code != 200 and settings.DEBUG:
+            traceback.print_exc()
+        return response

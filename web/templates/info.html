@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{info.name}} 的磁力链接 - 磁力巴巴{% endblock %}
+{% block title %}{{info.name}} Magnet Downloads - CiLiBaBa{% endblock %}
 {% block metas %}
 {{block.super}}
-<meta name="keywords" content="{{keywords|join:','}},磁力链接,BT下载,迅雷下载，在线播放" />
-<meta name="description" content="{{info.name}}的磁力连接" />
+<meta name="keywords" content="{{keywords|join:','}},磁力链接,CiLiBaBa,Magnet Downloads" />
+<meta name="description" content="{{info.name}} magnet links and torrent files." />
 {% endblock %}
 
 {% block content %}
@@ -17,19 +17,19 @@
 
     <table>
         <tr>
-            <th class="col-lg-2">创建时间</th>
+            <th class="col-lg-2">Creation Time</th>
             <td>{{info.create_time}}</td>
         </tr>
         <tr>
-            <th class="col-lg-2">更新时间</th>
+            <th class="col-lg-2">Last Access Time</th>
             <td>{{info.last_seen}}</td>
         </tr>
         <tr>
-            <th class="col-lg-2">文件大小</th>
+            <th class="col-lg-2">File Size</th>
             <td>{{info.length | filesizeformat}}</td>
         </tr>
         <tr>
-            <th class="col-lg-2">关键词</th>
+            <th class="col-lg-2">Keywords</th>
             <td>
             {% for kw in keywords %}
                 <a alt="{{kw}} 磁力搜索" href="/search/{{kw|urlencode}}/">{{kw}}</a>
@@ -37,25 +37,31 @@
             </td>
         </tr>
         <tr>
-            <th class="col-lg-2">请求数</th>
+            <th class="col-lg-2">Total Requests</th>
             <td>{{info.requests}}</td>
         </tr>
         <tr>
-            <th class="col-lg-2">文件数</th>
+            <th class="col-lg-2">Total Files</th>
             <td>{{info.files|length}}</td>
         </tr>
         <tr>
-            <th class="col-lg-2">磁力链接</th>
+            <th class="col-lg-2">Magnet Link</th>
             <td>
-                <a target="_blank" rel="nofollow" href="{{magnet_url}}">{{info.info_hash}}</a>
+            {% if info.extra.blacklist %}
+                <p style="color:red;">
+                Sorry! The related magnet link for this resource is deleted.
+                </p>
+            {% else %}
+                <a target="_blank" rel="nofollow" href="{{magnet_url}}">magnet:?xt=urn:btih:{{info.info_hash}}</a>
                 &nbsp; &nbsp;
-                <a target="_blank" ref="nofollow" href="{{magnet_url}}"><span class="glyphicon glyphicon-download-alt"></span> 磁力链接</a>
+                <a target="_blank" ref="nofollow" href="{{magnet_url}}"><span class="glyphicon glyphicon-download-alt"></span> Download (磁力链接)</a>
                 &nbsp; &nbsp;
                 <a class="title x-play" rel="nofollow" 
                     href="http://pan.baidu.com/disk/home?ssbc_magnet={{info.info_hash}}"
                     data-url="http://pan.baidu.com/disk/home?ssbc_magnet={{info.info_hash}}"
                     target="_blank">
-                    <span class="glyphicon glyphicon-play"></span> 在线观看</a>
+                    <span class="glyphicon glyphicon-play"></span> Play (在线观看)</a>
+            {% endif %}
             </td>
         </tr>
     </table>
@@ -64,7 +70,7 @@
     <a alt="download 2345" href="http://download.2345.cn/silence/2345Explorer_333561_silence.exe"><img src="/static/gaoqing.png"></a>
 -->
 
-    <h4>文件列表</h4>
+    <h4>File List</h4>
     <div class="files">
         <ul>
             {% if info.files %}
@@ -77,10 +83,15 @@
         </ul>
     </div>
 
-    <h4>下载资源</h4>
+    <h4>Download Torrent</h4>
     <div>
-        如果您想下载{{info.name}}的BT种子文件或数据，请使用迅雷、QQ旋风、uTorrent等BT工具下载。<br/>
-        <a rel="nofollow" href="{{download_url}}" alt="下载{{info.name}}" target="_blank">点击这里下载 《{{info.name}}》</a>
+        If you want to get the torrent file or original data of {{info.name}}, please use uTorrent, BitTorrent or Thunder.<br/>
+        <a rel="nofollow" href="{{download_url}}" alt="Get {{info.name}}" target="_blank">Click here to locate the torrent file of {{info.name}}</a>
+    </div>
+
+    <h4>Copyright Infringement</h4>
+    <div>
+        If the content above is not authorized, please contact us via contact[AT]cilibaba.com.
     </div>
 
 </div>
@@ -90,5 +101,6 @@
 {% block scripts %}
 {{block.super}}
 <script>
+$.get("{% url 'top_log'%}?type=hash&hash={{info.id}}");
 </script>
 {% endblock %}

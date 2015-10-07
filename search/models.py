@@ -36,6 +36,11 @@ class HashManager(models.Manager):
             for y in items:
                 if x['info_hash'] == y['info_hash']:
                     x['files'] = json.loads(y['file_list'])
+        items = Extra.objects.filter(hash_id__in=ids).values()
+        for x in res:
+            for y in items:
+                if x['id'] == y['hash_id']:
+                    x['extra'] = y
         return res
 
 class Hash(models.Model):
@@ -58,6 +63,17 @@ class Hash(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def is_blacklisted(self):
+        try:
+            return self.extra.blacklist
+        except:
+            return False
+
+
+class Extra(models.Model):
+    hash = models.OneToOneField(Hash)
+    blacklist = models.BooleanField('黑名单', default=False)
 
 
 class FileList(models.Model):

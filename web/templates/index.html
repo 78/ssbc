@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 {% load staticfiles %}
-{% block title %}磁力搜索_磁力链接_种子搜索_番号搜索-磁力巴巴{% endblock %}
+{% block title %}CiLiBaBa - 磁力搜索_磁力链接_种子搜索_番号搜索_MagnetSearch{% endblock %}
 {% block metas %}
 {{block.super}}
 <meta name="keywords" content="磁力巴巴,cilibaba,磁力助手,手撕包菜,磁力搜索,磁力链接,种子搜索网站,BT搜索,DHT搜索,番号搜索">
-<meta name="description" content="磁力巴巴是一个专业提供磁力连接搜索的网站，索引全网上千万磁力链接，可以使用迅雷、百度云等下载磁力链接的内容。">
+<meta name="description" content="CiLiBaBa，专业提供磁力连接搜索的网站，全网最新，千万磁力链接，可以使用迅雷、百度云等下载和浏览磁力链接的内容。">
 {% endblock %}
 
 {% block content %}
@@ -16,9 +16,9 @@
         </div>
         <div>
             <div class="input-group">
-                <input placeholder="搜索电影、电视剧、明星、游戏..." autocomplete="off" type="text" class="form-control x-kw" name="s">
+                <input placeholder="Movies, actors, or what do you want?" autocomplete="off" type="text" class="form-control x-kw" name="s">
                 <span class="input-group-btn">
-                <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span> 磁力搜索</button>
+                <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span> Search</button>
                 </span>
             </div>
         </div>
@@ -27,9 +27,6 @@
             {% for r in reclist%}
                 <a href="/search/{{r.keyword|urlencode}}/">{{r.keyword}}</a> &nbsp;&nbsp;&nbsp;&nbsp;
             {% endfor %}
-            </p>
-            <p class="tips2">
-                <p><a href="/howto/">如何免费在线播放磁力链接？</a>
             </p>
         </div>
         <div class="div-ads-front" style="margin-top: 40px; text-align:center; margin-left: 0px;">
@@ -46,22 +43,9 @@
 $(function(){
     $('.x-kw').focus();
 });
-
-$('.x-m-ok').click(function(){
-    ga('send', 'event', 'ads', 'click', 'ok', {'hitCallback': function(){
-        window.location = '/yunhelper/';
-    }});
-    return false;
-});
-$('.x-m-cancel').click(function(){
-    ga('send', 'event', 'ads', 'click', 'cancel');
-    return true;
-});
 setTimeout(function(){
     $('.good').fadeIn('slow');
 }, 500);
-
-
 </script>
 {% endblock %}
 
