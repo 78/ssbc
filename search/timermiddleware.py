@@ -5,8 +5,8 @@ from time import time
 
 class TimerMiddleware:
     def process_request(self, request):
-        ua_string = request.META.get('HTTP_USER_AGENT', u'')
-        request.is_mobile = u'iP' in ua_string or u'Android' in ua_string
+        ua_string = request.META.get('HTTP_USER_AGENT', '')
+        request.is_mobile = 'iP' in ua_string or 'Android' in ua_string
         request._tm_start_time = time()
 
     def process_response(self, request, response):

@@ -5,8 +5,10 @@ import sys
 import urllib
 
 from django.http import Http404
+from django.http.response import HttpResponse
+from django.core.urlresolvers import reverse
 from django.views.decorators.cache import cache_page
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from lib import politics
 import workers.metautils
@@ -23,20 +25,21 @@ def index(request):
     return render(request, 'index.html', {'reclist': reclist})
 
 
-@cache_page(3600*24)
+@cache_page(3600*2)
 def hash(request, h):
     try:
         res = Hash.objects.list_with_files([h])
         j = res[0]
     except Exception as e:
         raise Http404(str(e))
+    if j.get('extra') and j['extra']['status'] == 'deleted':
+        raise Http404('I am sorry :( The hash is deleted at %s.' % j['extra']['update_time'])
     d = {'info': j} 
     d['keywords'] = list(set(re_punctuations.sub(u' ', d['info']['name']).split()))
     if 'files' in d['info']:
         d['info']['files'] = [y for y in d['info']['files'] if not y['path'].startswith(u'_')]
         d['info']['files'].sort(key=lambda x:x['length'], reverse=True)
-    d['magnet_url'] = 'magnet:?xt=urn:btih:' + d['info']['info_hash'] + '&' + urllib.urlencode({'dn':d['info']['name'].encode('utf8')})
-    d['download_url'] = 'http://www.haosou.com/s?' + urllib.urlencode({'ie':'utf-8', 'src': 'ssbc', 'q': d['info']['name'].encode('utf8')})
+    d['related'] = Hash.objects.list_related(d['info']['id'], d['info']['name'])
     return render(request, 'info.html', d)
 
 
@@ -56,7 +59,11 @@ def search(request, keyword=None, p=None):
     d['sort'] = request.GET.get('s', 'create_time')
     d['ps'] = 10
     d['offset'] = d['ps']*(d['p']-1)
-    res = Hash.objects.search(keyword, d['offset'], d['ps'], d['category'], d['sort'])
+    try:
+        res = Hash.objects.search(keyword, d['offset'], d['ps'], d['category'], d['sort'])
+    except:
+        return HttpResponse('Sorry, an error has occurred: %s' % sys.exc_info()[1])
+
     d.update(res)
     # Fill info
     ids = [str(x['id']) for x in d['result']['items']]
@@ -66,7 +73,6 @@ def search(request, keyword=None, p=None):
             for y in items:
                 if x['id'] == y['id']:
                     x.update(y)
-                    x['magnet_url'] = 'magnet:?xt=urn:btih:' + x['info_hash'] + '&' + urllib.urlencode({'dn':x['name'].encode('utf8')})
                     x['maybe_fake'] = x['name'].endswith(u'.rar') or u'BTtiantang.com' in x['name'] or u'liangzijie' in x['name'] or u'720p高清视频' in x['name']
                     if 'files' in x:
                         x['files'] = [z for z in x['files'] if not z['path'].startswith(u'_')][:5]
@@ -94,14 +100,15 @@ def search(request, keyword=None, p=None):
 
 
 def hash_old(request, h):
-    return redirect('/hash/' + h, permanent=True)
+    item = get_object_or_404(Hash, info_hash=h)
+    return redirect(reverse('hash', args=(item.id,)), permanent=True)
 
 
 def search_old(request, kw, p):
     return redirect('list', kw, p)
 
 
-@cache_page(3600*24)
+@cache_page(3600*2)
 def howto(request):
     return render(request, 'howto.html', {})
 

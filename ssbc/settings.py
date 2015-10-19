@@ -115,10 +115,16 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'www/static')
 
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
+# Email
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@cilibaba.com'
+EMAIL_HOST_PASSWORD = 'you_need_to_set_this_in_deployment.py'
+DEFAULT_FROM_EMAIL = 'CiLiBaBa <noreply@cilibaba.com>'
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+SERVER_EMAIL = 'server@cilibaba.com'
+ADMINS = (('Xiaoxia', 'test@test.com'),)
+
+
+HOME_URL = ''
 

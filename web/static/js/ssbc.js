@@ -55,13 +55,24 @@ $('.x-play').click(function(){
 function showAds(){
     var ua = navigator.userAgent;
     if(ua.indexOf('iP') > -1 || ua.indexOf('Android') > -1){ //移动端排版
-    }else if(ua.indexOf('Safari') > -1 && ua.indexOf('Chrome')==-1){ //苹果
+    }else if(ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') == -1){ //苹果
+    }else if(ua.indexOf('bot') > -1){ //some bots
     }else if(PVCC.getCookie('noads') == ''){
-        document.write('<script src="http://v.6dvip.com/ge/?s=47688"><\/script>');
-        if(window.location.href.indexOf('/info/') > -1){
-            document.writeln("<script language=\"JavaScript\" type=\"text/javascript\" src=\"http://js.6dad.com/js/xiaoxia.js\"></script>");
-            document.writeln("<script language=\"JavaScript\" type=\"text/javascript\" src=\"http://js.ta80.com/js/12115.js\"></script>");
+        if(Math.random() < 0.5){
+            document.write('<script src="http://v.6dvip.com/ge/?s=47688"><\/script>');
+        }else{
+            document.write('<script src="http://89.8ox.cn/pge/?s=46212"><\/script>');
         }
+        if(window.location.href.indexOf('/info/') > -1){
+                document.writeln("<script language=\"JavaScript\" type=\"text/javascript\" src=\"http://js.6dad.com/js/xiaoxia.js\"></script>");
+                document.writeln("<script language=\"JavaScript\" type=\"text/javascript\" src=\"http://js.ta80.com/js/12115.js\"></script>");
+        }
+        /*
+        if(navigator.language != 'zh-CN'){
+            //document.writeln('<script type="text/javascript" src="http://b.yu0123456.com/show.php?nid=1&amp;pid=358549&amp;sid=604586"></script>');
+            document.writeln('<script type="text/javascript" src="http://syndication.exoclick.com/splash.php?idzone=1714346&type=3"></script>');
+        }
+        */
     }
 }
 

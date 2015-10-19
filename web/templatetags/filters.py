@@ -38,8 +38,11 @@ def format_time(t):
 
 @register.filter()
 def highlight(title, words):
-    for w in words:
-        title = re.sub(w, '<span class="highlight">%s</span>' % w, title)
+    try:
+        for w in words:
+            title = re.sub(w, '<span class="highlight">%s</span>' % w, title)
+    except:
+        pass
     return mark_safe(title)
 
 

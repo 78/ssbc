@@ -1,6 +1,6 @@
 {% load staticfiles %}
 <!DOCTYPE html>
-<html lang="en-US">
+<html>
   <head>
     <meta charset="utf-8">
     {% block metas %}
@@ -35,6 +35,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     {% endblock %}
+    {% include 'analytics.html' %}
   </body>
 </html>
 
