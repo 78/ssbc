@@ -127,6 +127,9 @@ async function fetchItems(ctx, ids, fetchFiles) {
         x.id = x._id
         delete x._id
     }
+    items.sort((a, b) => {
+        return ids.indexOf(a.id) - ids.indexOf(b.id)
+    })
     if(fetchFiles) {
         const files = await ctx.torrentdb.collection('filelist').find({_id: {$in: items.map((x)=>x.hash)}}).toArray()
         for(const a of items) {
