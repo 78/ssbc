@@ -1,5 +1,6 @@
 const Koa = require('koa')
 const MongoClient = require('mongodb').MongoClient
+const moment = require('moment')
 const cookie = require('koa-cookie')
 const bodyParser = require('koa-bodyparser')
 const router = require('koa-router')()
@@ -51,14 +52,9 @@ router.get('/apis/related', async (ctx) => {
 
         const results = await ctx.mdb.query(sql, [words, 1*(query.count||10)])
         const ids = results.map((x) => x.id)
-        const items = await ctx.torrentdb.collection('hash').find({_id: {$in: ids}}).toArray()
-        for(const x of items){
-            x.id = x._id
-            delete x._id
-        }
         ctx.body = {
             code: 0,
-            items: items
+            items: await fetchItems(ctx, ids, false)
         }
     }catch(e){
         console.error(new Date(), e)
@@ -106,7 +102,7 @@ router.get('/apis/search', async (ctx) => {
     let items = results[0]
     if(query.detail) {
         const ids = items.map((x) => x.id)
-        items = await fetchItems(ctx, ids)
+        items = await fetchItems(ctx, ids, true)
     }
     ctx.body = {
         code: 0,
@@ -115,7 +111,7 @@ router.get('/apis/search', async (ctx) => {
     }
 })
 
-async function fetchItems(ctx, ids) {
+async function fetchItems(ctx, ids, fetchFiles) {
     if(ids.length == 0)
         return []
     let items = null
@@ -131,11 +127,13 @@ async function fetchItems(ctx, ids) {
         x.id = x._id
         delete x._id
     }
-    const files = await ctx.torrentdb.collection('filelist').find({_id: {$in: items.map((x)=>x.hash)}}).toArray()
-    for(const a of items) {
-        for(const b of files) {
-            if(a.hash == b._id) {
-                a.files = b.v.filter((v) => !v.path.startsWith('__'))
+    if(fetchFiles) {
+        const files = await ctx.torrentdb.collection('filelist').find({_id: {$in: items.map((x)=>x.hash)}}).toArray()
+        for(const a of items) {
+            for(const b of files) {
+                if(a.hash == b._id) {
+                    a.files = b.v.filter((v) => !v.path.startsWith('__'))
+                }
             }
         }
     }
@@ -147,8 +145,28 @@ router.get('/apis/info', async (ctx) => {
     ctx.assert(ctx.query.ids, 400)
     const ids = ctx.query.ids.split('-')
     ctx.body = {
-        items: await fetchItems(ctx, ids),
+        items: await fetchItems(ctx, ids, true),
         code: 0
+    }
+})
+
+
+router.get('/apis/log', async (ctx) => {
+    const query = ctx.query
+    const start = parseInt(query.start || 0)
+    const count = parseInt(query.count || 50)
+    const date = moment().format('YYYY-MM-DD')
+    const logs = await ctx.torrentdb.collection('log').find({date:date}).sort({reqs: -1}).skip(start).limit(count).toArray()
+    const items = await fetchItems(ctx, logs.map((x)=>x.hash), false)
+    for(const l of logs) {
+        for(const it of items) {
+            if(l.hash == it.hash)
+                l.info = it
+        }
+    }
+    ctx.body = {
+        code: 0,
+        items: logs
     }
 })
 
