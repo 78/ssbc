@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<el-page-header @back="goBack" title="" content="Today Logs Rank">
+		<el-page-header @back="goBack" title="" :content="'Logs Rank ' + date">
 		</el-page-header>
 	    <el-table
-	    	
+	      size="small"
 	      :data="tableData"
 	      style="width: 100%">
 	      <el-table-column
@@ -51,7 +51,7 @@ export default {
             count: 20
         }
 		const res = await $axios.$get('/apis/log', {params: params})
-		return {tableData: res.items, currentPage: page}
+		return {tableData: res.items, currentPage: page, date: res.date}
 	},
 
 	methods: {

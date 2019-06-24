@@ -127,6 +127,9 @@ async function fetchItems(ctx, ids, fetchFiles) {
         x.id = x._id
         delete x._id
     }
+    items.sort((a, b) => {
+        return ids.indexOf(a.id) - ids.indexOf(b.id)
+    })
     if(fetchFiles) {
         const files = await ctx.torrentdb.collection('filelist').find({_id: {$in: items.map((x)=>x.hash)}}).toArray()
         for(const a of items) {
@@ -166,7 +169,17 @@ router.get('/apis/log', async (ctx) => {
     }
     ctx.body = {
         code: 0,
-        items: logs
+        items: logs,
+        date: date
+    }
+})
+
+
+router.get('/apis/spider', async (ctx) => {
+    const items = await ctx.torrentdb.collection('spider').find().sort({_id:-1}).limit(100).toArray()
+    ctx.body = {
+        items: items,
+        code: 0
     }
 })
 

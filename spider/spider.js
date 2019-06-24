@@ -2,7 +2,6 @@ const path = require('path')
 const moment = require('moment')
 const metadata = require('./metadata')
 const Spider = require('dhtspider')
-const mysql = require('mysql')
 const MongoClient = require('mongodb').MongoClient
 const stringHash = require('string-hash')
 
@@ -24,13 +23,6 @@ MongoClient.connect('mongodb://localhost:27017/admin', {useNewUrlParser: true}, 
         nextTorrentId = r._id + 1
         console.log('Next torrent _id is', nextTorrentId)
     })
-})
-const dbconn = mysql.createConnection({host: 'localhost', user: 'root', database: 'ssbc', charset:'utf8mb4'})
-dbconn.connect((err) => {
-    if(err) {
-        console.error(err)
-        process.exit(1)
-    }
 })
 
 
@@ -56,15 +48,16 @@ spider.on('ensureHash', (hash, addr) => {
         visited.shift()
 
     n_reqs += 1
-    const utcnow = new Date()
-    const today = moment(utcnow).add(8, 'hours').format('YYYY-MM-DD')
+    const utcnow = moment.utc().toDate()
+    const today = moment().format('YYYY-MM-DD')
     if(n_reqs >= 1000) {
         torrentdb.collection('log').bulkWrite(updates)
         updates.length = 0
-        dbconn.query('INSERT INTO search_statusreport(date,new_hashes,total_requests, valid_requests)  VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE ' +
-            'total_requests=total_requests+?, valid_requests=valid_requests+?, new_hashes=new_hashes+?',
-            [today, n_new, n_reqs, n_valid, n_reqs, n_valid, n_new])
-        console.log('[Report]', new Date(), 'n_reqs', n_reqs, 'n_valid', n_valid, 'n_new', n_new, 'n_downloading', Object.keys(downloading).length)
+        torrentdb.collection('spider').updateOne({_id: today}, {
+            $inc: {new_hashes: n_new, total_reqs: n_reqs, valid_reqs: n_valid}
+            }, {upsert: true})
+        console.log('[Report]', new Date(), 
+            'n_reqs', n_reqs, 'n_valid', n_valid, 'n_new', n_new, 'n_downloading', Object.keys(downloading).length)
         n_new = n_reqs = n_valid = 0
     }
     
@@ -95,7 +88,7 @@ spider.on('ensureHash', (hash, addr) => {
                 if(res.files.length > 0) {
                     torrentdb.collection('filelist').replaceOne({_id: hash}, {v: res.files}, {upsert:true})
                 }
-                /* save hash to mysql */
+                /* save hash to db */
                 const item = buildNewItem(hash, addr, res)
                 torrentdb.collection('hash').insertOne(item, (err, r) => {
                     if(err) {
@@ -112,7 +105,7 @@ spider.on('ensureHash', (hash, addr) => {
 
 
 function buildNewItem(hash, addr, res) {
-    const utcnow = new Date()
+    const utcnow = moment.utc().toDate()
     const item = {
         _id: nextTorrentId++,
         hash: hash,
