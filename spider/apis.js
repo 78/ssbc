@@ -175,6 +175,15 @@ router.get('/apis/log', async (ctx) => {
 })
 
 
+router.get('/apis/spider', async (ctx) => {
+    const items = await ctx.torrentdb.collection('spider').find().sort({_id:-1}).limit(100).toArray()
+    ctx.body = {
+        items: items,
+        code: 0
+    }
+})
+
+
 app.use(router.routes())
 app.use(cookie.default())
 app.use(bodyParser())
