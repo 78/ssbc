@@ -39,7 +39,7 @@ export default {
     submit() {
       if(this.keyword) {
         const url = '/search?q=' + encodeURIComponent(this.keyword)
-        this.$router.push(url)
+        window.location = url
       }
     }
   }

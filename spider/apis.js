@@ -25,7 +25,7 @@ app.use(async (ctx, next) => {
 
 function splitWords(keyword) {
     const words = []
-    const segs = keyword.replace(punctuations, ' ').split(' ').filter((x) => x!='')
+    const segs = keyword.replace(punctuations, ' ').replace(/-/g, ' ').split(' ').filter((x) => x!='')
     segs.forEach((w) => {
         if(/^[\x00-\x7F]*$/.test(w)) {
             words.push(w)

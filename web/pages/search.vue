@@ -6,7 +6,7 @@
 		<div class="list">
 			<div class="item" v-for="item in items">
 				<div class="name">
-					<nuxt-link :to="'/h/' + item.id">{{item.name}}</nuxt-link>
+					<a :href="'/h/' + item.id">{{item.name}}</a>
 				</div>
 				<div class="meta">
 					{{item.files.length}} files, {{item.len | size}}, {{item.reqs}} requests, logged {{item.atime | time}} ago

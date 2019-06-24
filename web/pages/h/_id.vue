@@ -36,7 +36,7 @@
 			  </el-collapse-item>
 			  <el-collapse-item title="Related Resources" name="5">
 			    <div v-for="ritem in related">
-			    	<nuxt-link :to="'/h/' + ritem.id">{{ritem.name}}</nuxt-link> {{ritem.len | size}}
+			    	<a :href="'/h/' + ritem.id">{{ritem.name}}</a> {{ritem.len | size}}
 			    </div>
 			  </el-collapse-item>
 			  <el-collapse-item title="Copyright Infringement" name="6">
