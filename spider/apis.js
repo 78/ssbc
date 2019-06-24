@@ -169,7 +169,8 @@ router.get('/apis/log', async (ctx) => {
     }
     ctx.body = {
         code: 0,
-        items: logs
+        items: logs,
+        date: date
     }
 })
 
