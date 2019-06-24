@@ -15,6 +15,9 @@
             <el-button slot="append" v-on:click="submit" icon="el-icon-search">Search</el-button>
           </el-input>
         </div>
+        <p class="rank">
+          <a href="/log">Today Logs Rank</a>
+        </p>
       </div>
     </el-main>
     <Footer />
@@ -76,5 +79,10 @@ export default {
   left: 50%;
   margin-left: -250px;
   margin-top: -50px;
+}
+
+.rank {
+  text-align: center;
+  margin-top: 20px;
 }
 </style>
