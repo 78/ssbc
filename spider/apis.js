@@ -122,6 +122,9 @@ async function fetchItems(ctx, ids) {
     if(ids[0].toString().length == 40) {
         items = await ctx.torrentdb.collection('hash').find({hash: {$in: ids}}).toArray()
     }else{
+        if(isNaN(ids[0])) {
+            return []
+        }
         items = await ctx.torrentdb.collection('hash').find({_id: {$in: ids.map((x)=>parseInt(x))}}).toArray()
     }
     for(const x of items){

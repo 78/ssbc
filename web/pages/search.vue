@@ -39,6 +39,7 @@ export default {
 
 	async asyncData({query, $axios}) {
         try{
+            console.log(new Date(), 'search', query.q)
             const page = parseInt(query.p || 1)
             const params = {
                 keyword: query.q,

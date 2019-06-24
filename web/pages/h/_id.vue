@@ -51,9 +51,13 @@
 export default {
 	layout: 'search',
 
-	async asyncData({params, $axios}) {
+	async asyncData({params, $axios, error}) {
         try{
             const res = await $axios.$get('/apis/info', {params: {ids: params.id}})
+            if(!res.items[0]) {
+                error({statusCode: 404, message: 'Hash not found.'})
+                return
+            }
             const data = {
                 item: res.items[0],
                 activeNames: ['1', '2', '3', '4', '5', '6']
