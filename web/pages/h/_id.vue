@@ -48,25 +48,27 @@
 </template>
 
 <script type="text/javascript">
-import axios from '@/plugins/axios'
-
 export default {
 	layout: 'search',
 
-	async asyncData({params}) {
-		const res = await axios.get('/apis/info', {params: {ids: params.id}})
-		const data = {
-			item: res.data.items[0],
-			activeNames: ['1', '2', '3', '4', '5', '6']
-		}
-		const res2 = await axios.get('https://www.shousibaocai.net/apis/related', {params: {keyword: data.item.name, count: 11}})
-		data.related = res2.data.items.filter((x) => x.id != params.id)
+	async asyncData({params, $axios}) {
+        try{
+            const res = await $axios.$get('/apis/info', {params: {ids: params.id}})
+            const data = {
+                item: res.items[0],
+                activeNames: ['1', '2', '3', '4', '5', '6']
+            }
+            const res2 = await $axios.$get('/apis/related', {params: {keyword: data.item.name, count: 11}})
+            data.related = res2.items.filter((x) => x.id != params.id)
 
-		if(!data.item.files) {
-			data.item.files = [{path: data.item.name, length: data.item.len}]
-		}
-		data.magnetLink = 'magnet:?xt=urn:btih:' + data.item.hash + '&dn=' + data.item.name
-		return data
+            if(!data.item.files) {
+                data.item.files = [{path: data.item.name, length: data.item.len}]
+            }
+            data.magnetLink = 'magnet:?xt=urn:btih:' + data.item.hash + '&dn=' + data.item.name
+            return data
+        }catch(e) {
+            console.error(new Date(), params, e)
+        }
 	},
 
 	methods: {

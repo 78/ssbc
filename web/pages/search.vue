@@ -34,42 +34,44 @@
 
 
 <script type="text/javascript">
-import axios from '@/plugins/axios'
-
 export default {
 	layout: 'search',
 
-	async asyncData({query}) {
-		const page = parseInt(query.p || 1)
-		const params = {
-			keyword: query.q,
-			detail: 1,
-			start: (page - 1) * 10,
-			count: 10
-		}
-		const res = await axios.get('/apis/search', {params: params})
-		const data = {
-			items: res.data.items,
-			meta: res.data.meta,
-			keyword: query.q,
-			currentPage: page,
-			words: query.q.replace(/。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]/g, ' ').split(' ').filter((x) => x!='')
-		}
-		data.items.forEach((v) => {
-			if(!v.files) {
-				v.files = [{path: v.name, length: v.len}]
-			}
-			v.files.sort((a, b) => b.length - a.length)
-			v.files = v.files.slice(0, 5)
-			v.files.forEach((s) => {
-				for(const w of data.words) {
-					s.path = s.path.replace(new RegExp(w, 'ig'), (p1) => {
-						return '<span class="highlight">' + p1 + '</span>'
-					})
-				}
-			})
-		})
-		return data
+	async asyncData({query, $axios}) {
+        try{
+            const page = parseInt(query.p || 1)
+            const params = {
+                keyword: query.q,
+                detail: 1,
+                start: (page - 1) * 10,
+                count: 10
+            }
+            const res = await $axios.$get('/apis/search', {params: params})
+            const data = {
+                items: res.items,
+                meta: res.meta,
+                keyword: query.q,
+                currentPage: page,
+                words: query.q.replace(/。|，|,|！|…|!|《|》|<|>|\"|'|:|：|？|\?|、|\||“|”|‘|’|；|—|（|）|·|\(|\)|　|\.|【|】|『|』|@|&|%|\^|\*|\+|\||<|>|~|`|\[|\]/g, ' ').split(' ').filter((x) => x!='')
+            }
+            data.items.forEach((v) => {
+                if(!v.files) {
+                    v.files = [{path: v.name, length: v.len}]
+                }
+                v.files.sort((a, b) => b.length - a.length)
+                v.files = v.files.slice(0, 5)
+                v.files.forEach((s) => {
+                    for(const w of data.words) {
+                        s.path = s.path.replace(new RegExp(w, 'ig'), (p1) => {
+                            return '<span class="highlight">' + p1 + '</span>'
+                        })
+                    }
+                })
+            })
+            return data
+        }catch(e){
+            console.error(new Date(), query, e)
+        }
 	},
 
 	methods: {

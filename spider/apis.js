@@ -46,18 +46,23 @@ router.get('/apis/related', async (ctx) => {
         ctx.body = []
         return
     }
-    const sql = 'SELECT id FROM hash WHERE MATCH(?) LIMIT 0,? OPTION max_matches=1000, max_query_time=50'
+    try{
+        const sql = 'SELECT id FROM hash WHERE MATCH(?) LIMIT 0,? OPTION max_matches=1000, max_query_time=50'
 
-    const results = await ctx.mdb.query(sql, [words, 1*(query.count||10)])
-    const ids = results.map((x) => x.id)
-    const items = await ctx.torrentdb.collection('hash').find({_id: {$in: ids}}).toArray()
-    for(const x of items){
-        x.id = x._id
-        delete x._id
-    }
-    ctx.body = {
-        code: 0,
-        items: items
+        const results = await ctx.mdb.query(sql, [words, 1*(query.count||10)])
+        const ids = results.map((x) => x.id)
+        const items = await ctx.torrentdb.collection('hash').find({_id: {$in: ids}}).toArray()
+        for(const x of items){
+            x.id = x._id
+            delete x._id
+        }
+        ctx.body = {
+            code: 0,
+            items: items
+        }
+    }catch(e){
+        console.error(new Date(), e)
+        return []
     }
 })
 
@@ -111,7 +116,14 @@ router.get('/apis/search', async (ctx) => {
 })
 
 async function fetchItems(ctx, ids) {
-    const items = await ctx.torrentdb.collection('hash').find({_id: {$in: ids}}).toArray()
+    if(ids.length == 0)
+        return []
+    let items = null
+    if(ids[0].toString().length == 40) {
+        items = await ctx.torrentdb.collection('hash').find({hash: {$in: ids}}).toArray()
+    }else{
+        items = await ctx.torrentdb.collection('hash').find({_id: {$in: ids.map((x)=>parseInt(x))}}).toArray()
+    }
     for(const x of items){
         x.id = x._id
         delete x._id
@@ -130,7 +142,7 @@ async function fetchItems(ctx, ids) {
 
 router.get('/apis/info', async (ctx) => {
     ctx.assert(ctx.query.ids, 400)
-    const ids = ctx.query.ids.split('-').map((x) => parseInt(x))
+    const ids = ctx.query.ids.split('-')
     ctx.body = {
         items: await fetchItems(ctx, ids),
         code: 0
