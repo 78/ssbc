@@ -1,22 +1,23 @@
 <template>
   <el-container>
     <el-header>
-      <h1 class="title">
-        手撕包菜
-      </h1>
     </el-header>
     <el-main>
       <div class="content">
+        <h1 class="title">
+          手撕包菜
+        </h1>
         <p class="subtitle">
           Search <b>anything</b> you want :D
         </p>
-        <div style="margin-top: 15px;" v-on:keyup.enter="submit">
+        <div style="margin-top: 30px;" v-on:keyup.enter="submit">
           <el-input placeholder="Movie names" v-model="keyword" class="input-keyword">
             <el-button slot="append" v-on:click="submit" icon="el-icon-search">Search</el-button>
           </el-input>
         </div>
         <p class="rank">
-          <a href="/log">Today Logs Rank</a>
+          <el-button type="text" @click="goLogsRank">Logs Rank</el-button>
+          <el-button type="text" @click="goSpider">Spider Report</el-button>
         </p>
       </div>
     </el-main>
@@ -44,6 +45,14 @@ export default {
         const url = '/search?q=' + encodeURIComponent(this.keyword)
         window.location = url
       }
+    },
+
+    goLogsRank() {
+      window.location = '/log'
+    },
+
+    goSpider() {
+      window.location = '/spider'
     }
   }
 };
@@ -75,7 +84,7 @@ export default {
 }
 .content {
   position: absolute;
-  top: 50%;
+  top: 20%;
   left: 50%;
   margin-left: -250px;
   margin-top: -50px;
@@ -83,6 +92,6 @@ export default {
 
 .rank {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 </style>
