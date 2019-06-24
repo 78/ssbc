@@ -108,13 +108,6 @@ export default {
 	color: #555;
 }
 
-.item .name a{
-	color: #1a0dab;
-	text-decoration: none;
-}
-.item .name a:hover {
-	text-decoration: underline;
-}
 
 .el-pagination {
 	margin: 30px 0 10px 0;
