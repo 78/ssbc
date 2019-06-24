@@ -12,7 +12,7 @@
     </div>
     <div>
         <p class="copyright">
-        &copy; 2013 ~ 2019 www.shousibaocai.net
+        &copy; 2013 ~ 2019 www.shousibaocai.org
         </p>
     </div>
   </el-footer>

@@ -2,7 +2,7 @@
 手撕包菜网站
 
 ## 网站说明
-这是 www.shousibaocai.com 的网站源代码。
+这是 www.shousibaocai.org 的网站源代码。
 开源的目的是为了促进技术交流和相互学习，把DHT与搜索引擎技术应用到更广泛的领域去。
 
 本站于2015年5月使用django改写。
