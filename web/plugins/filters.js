@@ -34,7 +34,7 @@ function time (t) {
 }
 
 function datetime (t) {
-	return moment(t).add(moment().utcOffset(), 'minutes').format('YYYY-MM-DD hh:mm:ss')
+	return moment(t).format('YYYY-MM-DD HH:mm:ss')
 }
 
 Vue.filter('size', size)
