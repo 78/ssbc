@@ -15,6 +15,10 @@ module.exports = {
       env: {
           PORT: 3000
       }
+  },
+  {
+      name: 'task',
+      script: './task.js'
   }
   ]
 }

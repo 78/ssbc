@@ -6,6 +6,7 @@
   "dependencies": {
     "bittorrent-protocol": "^3.0.1",
     "buffer-crc32": "^0.2.13",
+    "cron": "^1.7.1",
     "dhtspider": "^0.1.0",
     "iconv": "^2.3.4",
     "iconv-lite": "^0.4.24",
