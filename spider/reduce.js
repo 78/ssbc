@@ -6,7 +6,7 @@ MongoClient.connect('mongodb://localhost:27017/admin', {useNewUrlParser: true}, 
         process.exit(1)
     }
     const torrentdb = mconn.db('torrent')
-    const stream = torrentdb.collection('log').find({date: process.argv[2]}).stream()
+    const stream = torrentdb.collection('log').find({date: process.env.DATE}).stream()
     const d = []
     let ii = 0
     stream.on('error', (err) => {
@@ -20,7 +20,7 @@ MongoClient.connect('mongodb://localhost:27017/admin', {useNewUrlParser: true}, 
             }
         })
         ii += 1
-        if(d.length >= 10000) {
+        if(d.length >= 100000) {
             stream.pause()
             console.log(ii)
             torrentdb.collection('hash').bulkWrite(d, (err, r) => {
@@ -39,7 +39,7 @@ MongoClient.connect('mongodb://localhost:27017/admin', {useNewUrlParser: true}, 
                 if(err) {
                     console.error(err)
                 }else{
-                    console.log('done')
+                    console.log('done', process.env.DATE)
                     mconn.close()
                 }
             })

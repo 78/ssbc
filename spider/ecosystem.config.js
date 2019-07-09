@@ -4,7 +4,7 @@ module.exports = {
     script : "./spider.js",
     env: {
         PORT: 6881,
-        TABLE_CAPTION: 200,
+        TABLE_CAPTION: 1000,
         MAX_CONCURRENT: 500
     },
     cron_restart: "0 */3 * * *"
@@ -15,6 +15,10 @@ module.exports = {
       env: {
           PORT: 3000
       }
+  },
+  {
+      name: 'task',
+      script: './task.js'
   }
   ]
 }
