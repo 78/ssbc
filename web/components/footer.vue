@@ -15,6 +15,7 @@
         &copy; 2013 ~ 2019 www.shousibaocai.org
         </p>
     </div>
+    <script type="text/javascript" src="https://v1.cnzz.com/z_stat.php?id=1278001465&web_id=1278001465"></script>
   </el-footer>
 </template>
 
@@ -39,3 +40,4 @@
   color: #888;
 }
 </style>
+
