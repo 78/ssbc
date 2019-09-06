@@ -20,7 +20,7 @@ MongoClient.connect('mongodb://localhost:27017/admin', {useNewUrlParser: true}, 
     torrentdb.collection('log').createIndex({hash: 1})
     torrentdb.collection('hash').createIndex({hash: 1}, {unique: 1})
     torrentdb.collection('hash').find().sort({_id: -1}).limit(1).next((err, r) => {
-        nextTorrentId = r._id + 1
+        nextTorrentId = (r && r._id || 0) + 1
         console.log('Next torrent _id is', nextTorrentId, 'tableCaption', process.env.TABLE_CAPTION)
     })
 })
