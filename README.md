@@ -89,11 +89,11 @@ mkdir -p /data/bt/index/db /data/bt/index/binlog
 
 3. 初始化索引
 
-``
+```
 cd spider
 indexer -c sphinx.conf hash
 searchd -c sphinx.conf
-``
+```
 
 
 ## 网站说明
