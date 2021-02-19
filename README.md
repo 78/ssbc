@@ -6,11 +6,12 @@
 使用CentOS7操作系统。
 
 ### 数据库 ###
-1. 按照MongoDB
+1. 安装MongoDB
 
 ```
 yum install mongodb mongodb-server
 ```
+如有安装问题，查询官网步骤即可.
 
 2. 运行MongoDB
 
@@ -39,6 +40,8 @@ cd spider && npm install && cd ..
 cd web && npm install && npm run build && cd ..
 ```
 
+如果出现npm iconv安装失败，可能需要安装gcc/g++ 编译工具.
+
 ### 爬虫网站 ###
 1. 启动爬虫
 
@@ -57,22 +60,25 @@ cd web && pm2 start ecosystem.config.js && cd ..
 
 ```
 yum install nginx
-service nginx start
-vim /etc/nginx/conf.d/ssbc.conf
+vim /etc/nginx/nginx.conf
 ```
 
-加入以下配置。
+加入proxy_pass的配置。
 
 ```
 server {
-    listen 80;
-    server_name www.xxx.com;
+...
     location / {
         proxy_pass http://localhost:3001;
     }
+...
 }
 ```
 
+启动nginx.
+```
+service nginx start
+```
 
 ### 搜索引擎 ###
 1. 安装SphinxSearch
@@ -89,11 +95,11 @@ mkdir -p /data/bt/index/db /data/bt/index/binlog
 
 3. 初始化索引
 
-``
+```
 cd spider
 indexer -c sphinx.conf hash
 searchd -c sphinx.conf
-``
+```
 
 
 ## 网站说明
