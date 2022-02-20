@@ -199,7 +199,7 @@ async function startServer() {
         port: 9306,
         multipleStatements: true
     })
-    app.listen(process.env.PORT || 3000, async () => {
+    app.listen(process.env.PORT || 3000, 'localhost', async () => {
         console.log(new Date(), 'Server is istening...')
         if(process.send) {
             process.send('ready')
